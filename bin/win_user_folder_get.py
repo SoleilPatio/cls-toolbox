@@ -5,11 +5,12 @@ import re
 import sys
 import os
 
+REG_KEY = r'HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders'
 
 def WinUserFolderGet(value_name):
     output = subprocess.check_output(
-        ['reg', 'query', r'HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders', '/v',  value_name])
-    match_list = re.findall(r"%s\s+\w+\s+([%%\w: \\\\]*)" % value_name, output)
+        ['reg', 'query', REG_KEY, '/v',  value_name])
+    match_list = re.findall(r"%s\s+\w+\s+([^\r^\n]*)" % value_name, output)
     return WinEnvVarResolve(match_list[0])
 
 
@@ -33,7 +34,7 @@ if __name__ == "__main__":
 
     if (args.list):
         output = subprocess.check_output(
-            ['reg', 'query', r'HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders'])
+            ['reg', 'query', REG_KEY])
         print output
 
     if (args.value_name):
