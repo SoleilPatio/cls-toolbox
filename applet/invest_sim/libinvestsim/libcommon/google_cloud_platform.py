@@ -84,7 +84,6 @@ class GoogleCloudPlatform(object):
         os.remove(self.credentials_file)
         print("[INFO]: credential files removed: %s" % self.credentials_file)
 
-
     def GetGoogleSheetsApiService(self):
         service = GoogleSheetsApiService()
         service.CreateService(self.http)
@@ -136,7 +135,6 @@ class GoogleSheetsApiService(object):
             spreadsheetId=self.spread_sheet_id).execute()
         return sheets["properties"]["title"]
 
-
     def Test(self):
         sheets = self.service.spreadsheets().sheets()
         print("sheets1=", sheets)
@@ -156,6 +154,62 @@ class GoogleSheetsApiService(object):
         print("GetSheetNames()=", self.GetSheetNames())
 
 
+"""
+Utilities
+"""
+"""
+    RowData : 2-D list , 1st row is header (data name)
+    ColumnData: one 1-D list  per data type (from header)
+"""
+
+
+def SheetRowDataToColumnData(list_2d):
+    ret = {}
+    # 1st row is sheet header
+    header_list = []
+    first_row = list_2d[0]
+    for name in first_row:
+        header_list.append(name)
+        ret[name] = []
+
+    # 2nd row ~ end are data
+    for row in list_2d[1:]:
+        for i, record in enumerate(row):
+            name = header_list[i]
+            ret[name].append(record)
+
+    return ret
+
+
+"""
+    RowData : 2-D list , 1st row is header (data name)
+    DicObj: one row a object, 1st column as index
+"""
+
+
+def SheetRowDataToDicObj(list_2d):
+    ret = {}
+    # 1st row is sheet header
+    header_list = []
+    first_row = list_2d[0]
+    for name in first_row:
+        header_list.append(name)
+
+    # 2nd row ~ end are data
+    for row in list_2d[1:]:
+        index_record = None
+        for i, record in enumerate(row):
+            name = header_list[i]
+            if i == 0:  # use 1st name as index
+                ret[record] = {}
+                index_record = record
+            else:
+                ret[index_record][name] = record
+    return ret
+
+
+
+
 
 if __name__ == '__main__':
     # CLIENT_SECRET_FILE = 'client_secret.json'
@@ -166,18 +220,33 @@ if __name__ == '__main__':
     # main()
     # 指定 sheet ID, 你可以從 URL 得到 ID.
     spreadsheetId = '1i0Mr9BCpGDVyScA808_nTz70nM-oSo-T7gmBSxqFL-E'
+    ssid_investsim_data = "1qJ0eT6sjo_f8dguSk7ccsd11v1o1BbR73LJUslur1W0"
 
     gcp = GoogleCloudPlatform(CLIENT_SECRET_FILE)
     sheets_api = gcp.GetGoogleSheetsApiService()
-    sheets_api.OpenSpreadSheet(spreadsheetId)
 
+    # 1nd sheet
+    sheets_api.OpenSpreadSheet(spreadsheetId)
     print("XINA50=", sheets_api.GetSheetValues('XINA50'))
     print("2454=", sheets_api.GetSheetValues('2454'))
-
     values = sheets_api.GetSheetValues('XINA50')
-    for row in values:
-        for cell in row:
-            print(cell)
-        print("")
+    col_data = SheetRowDataToColumnData(values)
+    print(col_data)
+    for key in col_data:
+        print(key,  col_data[key])
 
-    sheets_api.Test()
+    # 2nd sheet
+    sheets_api.OpenSpreadSheet(ssid_investsim_data)
+    values = sheets_api.GetSheetValues('data')
+    print("data = ", values)
+    dic_obj = SheetRowDataToDicObj(values)
+    print(dic_obj)
+    for key in dic_obj:
+        print(key," ", end='' )
+        for k2 in dic_obj[key]:
+            print(k2,dic_obj[key][k2]," ", end="")
+        print()
+
+    print(dic_obj["2454"][u"保證金"])
+
+    # sheets_api.Test()

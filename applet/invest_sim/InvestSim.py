@@ -2,15 +2,70 @@
 from __future__ import print_function
 
 import os
+import json
 import matplotlib.pyplot as plt
 
 
 from libinvestsim.ivs_config import IvsConfig
-from libinvestsim.libcommon.google_cloud_platform import GoogleCloudPlatform
+from libinvestsim.libcommon.google_cloud_platform import *
 
 
 EXE_DIR = os.path.dirname(os.path.abspath(__file__))
 CONFIG_FILE = os.path.join(EXE_DIR, "config.json")
+
+
+class InvestSimApp(object):
+    def __init__(self):
+        super(InvestSimApp, self).__init__()
+        self.config = IvsConfig()  # IvsConfig Object
+        self.gcp = None  # GoogleCloudPlatform object
+        self.sheet_api = None  # GoogleSheetsApiService()
+        self.data = {}  #whole data
+
+
+    def Initial(self, config_file_name):
+        """
+        Load Config
+        """
+        # self.config.SaveDefaultConfig()
+        self.config.LoadConfig(config_file_name)
+        self.config.Show()
+
+        """
+        Connect Google API
+        """
+        self.gcp = GoogleCloudPlatform(self.config.secret_file())
+        self.sheets_api = self.gcp.GetGoogleSheetsApiService()
+
+
+    def LoadData(self):
+        self.load_data_daily_track()
+        self.load_data_data()
+        self.load_data_dry_run()
+
+    def load_data_daily_track(self):
+        self.sheets_api.OpenSpreadSheet(
+            self.config.spreadsheet_id_investsim_daily_track())
+
+        for sheet_name in self.sheets_api.GetSheetNames():
+            values = self.sheets_api.GetSheetValues(sheet_name)
+            print(sheet_name,"=", values )
+            col_data = SheetRowDataToColumnData(values)
+            self.data[sheet_name] = col_data    #sheet_name is product name,use as index
+        
+        print("self.data =", json.dumps(self.data, indent=4))
+        # print("XINA50=", self.sheets_api.GetSheetValues('XINA50'))
+        # print("2454=", self.sheets_api.GetSheetValues('2454'))
+
+
+    def load_data_data(self):
+        self.sheets_api.OpenSpreadSheet(
+            self.config.spreadsheet_id_investsim_data())
+
+    def load_data_dry_run(self):
+        self.sheets_api.OpenSpreadSheet(
+            self.config.spreadsheet_id_investsim_run())
+
 
 
 class StockPrice(object):
@@ -51,38 +106,16 @@ def OpenBroswer():
 
 if __name__ == '__main__':
 
-    """
-    Load Config
-    """
-    ivs_conf = IvsConfig()
-    # ivs_conf.SaveDefaultConfig()
-    data = ivs_conf.LoadConfig(CONFIG_FILE)
-    ivs_conf.Show()
-    
-    """
-    Connect Google API
-    """
-    gcp = GoogleCloudPlatform(ivs_conf.secret_file())
-    sheets_api = gcp.GetGoogleSheetsApiService()
+    MainApp = InvestSimApp()
 
-    """
-    Load Data
-    """
-    sheets_api.OpenSpreadSheet(ivs_conf.spreadsheet_id_investsim_daily_track())
-
-
-    print("XINA50=", sheets_api.GetSheetValues('XINA50'))
-    print("2454=", sheets_api.GetSheetValues('2454'))
-
+    MainApp.Initial(CONFIG_FILE)
+    MainApp.LoadData()
 
 
     """
     Test: clear credential
     """
     # gcp.ClearCredentials()
-
-
-
 
 
     # stockprice = StockPrice()
@@ -95,4 +128,4 @@ if __name__ == '__main__':
     # # plt.plot(stockprice.GetValues(), ".")
     # plt.plot(positions, "-")
     # plt.show()
-    # print("\nDonw")
+    print("\nDone")
