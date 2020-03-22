@@ -1,5 +1,16 @@
 # -*- coding: utf-8 -*-
+from __future__ import print_function
+
+import os
 import matplotlib.pyplot as plt
+
+
+from libinvestsim.ivs_config import IvsConfig
+from libinvestsim.libcommon.google_cloud_platform import GoogleCloudPlatform
+
+
+EXE_DIR = os.path.dirname(os.path.abspath(__file__))
+CONFIG_FILE = os.path.join(EXE_DIR, "config.json")
 
 
 class StockPrice(object):
@@ -32,15 +43,56 @@ class FuturePosition(object):
         return positions
 
 
+def OpenBroswer():
+    import webbrowser
+    webbrowser.open(
+        'https://docs.google.com/spreadsheets/d/1i0Mr9BCpGDVyScA808_nTz70nM-oSo-T7gmBSxqFL-E/')
+
+
 if __name__ == '__main__':
-    stockprice = StockPrice()
-    futureposition = FuturePosition()
 
-    positions = futureposition.ApplyPolicy(stockprice)
+    """
+    Load Config
+    """
+    ivs_conf = IvsConfig()
+    # ivs_conf.SaveDefaultConfig()
+    data = ivs_conf.LoadConfig(CONFIG_FILE)
+    ivs_conf.Show()
+    
+    """
+    Connect Google API
+    """
+    gcp = GoogleCloudPlatform(ivs_conf.secret_file())
+    sheets_api = gcp.GetGoogleSheetsApiService()
 
-    print positions
+    """
+    Load Data
+    """
+    sheets_api.OpenSpreadSheet(ivs_conf.spreadsheet_id_investsim_daily_track())
 
-    # plt.plot(stockprice.GetValues(), ".")
-    plt.plot(positions, "-")
-    plt.show()
-    print "\nDonw"
+
+    print("XINA50=", sheets_api.GetSheetValues('XINA50'))
+    print("2454=", sheets_api.GetSheetValues('2454'))
+
+
+
+    """
+    Test: clear credential
+    """
+    # gcp.ClearCredentials()
+
+
+
+
+
+    # stockprice = StockPrice()
+    # futureposition = FuturePosition()
+
+    # positions = futureposition.ApplyPolicy(stockprice)
+
+    # print(positions)
+
+    # # plt.plot(stockprice.GetValues(), ".")
+    # plt.plot(positions, "-")
+    # plt.show()
+    # print("\nDonw")

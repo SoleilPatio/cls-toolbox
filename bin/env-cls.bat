@@ -1,0 +1,1 @@
+set PATH=%PATH%;C:\Users\cloud\OneDrive\BIN\cls-toolbox\applet\invest_sim
