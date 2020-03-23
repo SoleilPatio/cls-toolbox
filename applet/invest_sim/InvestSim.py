@@ -20,8 +20,7 @@ class InvestSimApp(object):
         self.config = IvsConfig()  # IvsConfig Object
         self.gcp = None  # GoogleCloudPlatform object
         self.sheet_api = None  # GoogleSheetsApiService()
-        self.data = {}  #whole data
-
+        self.data = {}  # whole data
 
     def Initial(self, config_file_name):
         """
@@ -37,7 +36,6 @@ class InvestSimApp(object):
         self.gcp = GoogleCloudPlatform(self.config.secret_file())
         self.sheets_api = self.gcp.GetGoogleSheetsApiService()
 
-
     def LoadData(self):
         self.load_data_daily_track()
         self.load_data_data()
@@ -49,23 +47,37 @@ class InvestSimApp(object):
 
         for sheet_name in self.sheets_api.GetSheetNames():
             values = self.sheets_api.GetSheetValues(sheet_name)
-            print(sheet_name,"=", values )
+            print(sheet_name, "=", values)
             col_data = SheetRowDataToColumnData(values)
-            self.data[sheet_name] = col_data    #sheet_name is product name,use as index
-        
-        print("self.data =", json.dumps(self.data, indent=4))
-        # print("XINA50=", self.sheets_api.GetSheetValues('XINA50'))
-        # print("2454=", self.sheets_api.GetSheetValues('2454'))
+            # sheet_name is product name,use as index
+            self.data[sheet_name] = col_data
+
+        print("self.data 1 =", json.dumps(
+            self.data, indent=4).decode('unicode-escape'))
 
 
     def load_data_data(self):
         self.sheets_api.OpenSpreadSheet(
             self.config.spreadsheet_id_investsim_data())
 
+        sheet_name_list = self.sheets_api.GetSheetNames()
+        values = self.sheets_api.GetSheetValues(
+            sheet_name_list[0])  # Use the 1st sheet
+        Objs = SheetRowDataToDicObj(values)
+        print("data_data:", str(Objs).decode('unicode-escape'))
+        for key in Objs:
+            if key in self.data:
+                self.data[key].update(Objs[key])
+            else:
+                self.data[key] = Objs[key]
+
+        print("self.data 2 =", json.dumps(
+            self.data, indent=4).decode('unicode-escape'))
+
+
     def load_data_dry_run(self):
         self.sheets_api.OpenSpreadSheet(
             self.config.spreadsheet_id_investsim_run())
-
 
 
 class StockPrice(object):
@@ -111,12 +123,10 @@ if __name__ == '__main__':
     MainApp.Initial(CONFIG_FILE)
     MainApp.LoadData()
 
-
     """
     Test: clear credential
     """
     # gcp.ClearCredentials()
-
 
     # stockprice = StockPrice()
     # futureposition = FuturePosition()
