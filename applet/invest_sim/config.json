@@ -2,6 +2,7 @@
     "ssid_investsim_daily_track": "1i0Mr9BCpGDVyScA808_nTz70nM-oSo-T7gmBSxqFL-E" ,
     "ssid_investsim_data": "1qJ0eT6sjo_f8dguSk7ccsd11v1o1BbR73LJUslur1W0" ,
     "ssid_investsim_dry_run": "1WfF20vvAjZqSrwiN1CAzxXGm6X_RGjjdduF0Kukv-o8" ,
-    "google_client_secret_file": "C:\\APN\\USERS\\clouds\\Google 雲端硬碟\\MyPrivy\\憑證\\Google-API\\invest-sim-google-api\\client_secret_invest-sim.json"
+    // "google_client_secret_file": "C:\\APN\\USERS\\clouds\\Google 雲端硬碟\\MyPrivy\\憑證\\Google-API\\invest-sim-google-api\\client_secret_invest-sim.json"
     // "google_client_secret_file": "C:\\APN\\USERS\\clouds\\Google 雲端硬碟\\MyPrivy\\憑證\\Google-API\\hello-world-google-api\\client_id(hello-world-google-api-client).json"
+    "google_client_secret_file": "/home/clouds/Documents/client_secret_invest-sim.json"
 }
