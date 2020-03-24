@@ -7,3 +7,6 @@ tempCodeRunnerFile*
 
 #python
 *.pyc
+
+#app
+applet/invest_sim/data

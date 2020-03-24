@@ -2,7 +2,7 @@
 from __future__ import print_function
 # import json
 import commentjson
-
+import codecs
 
 class JsonConfig(object):
     def __init__(self):
@@ -19,18 +19,19 @@ class JsonConfig(object):
 
     def SaveData(self, data, json_file_name):
         self.data = data
-        with open(json_file_name, 'w') as outfile:
-            commentjson.dump(self.data, outfile, indent=4)
+        with codecs.open(json_file_name, 'w' , encoding='utf-8') as outfile:
+            commentjson.dump(self.data, outfile, indent=4 , ensure_ascii=False, sort_keys=True)
 
     def Show(self):
         self.ShowData(self.data)
 
     def ShowData(self, data):
-        print(commentjson.dumps(data, indent=4))
+        print(commentjson.dumps(data, indent=4 , sort_keys=True).decode('unicode-escape'))
 
 
 if __name__ == '__main__':
     jsonconf = JsonConfig()
-    jsonconf.Load("test-config-common.json")
+    jsonconf.Load("test-config-common-read.json")
     jsonconf.Show()
+    jsonconf.Save("test-config-common-write.json")
     pass
