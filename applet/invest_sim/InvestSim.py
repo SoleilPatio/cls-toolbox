@@ -209,8 +209,40 @@ if __name__ == "__main__":
     gui_log_handler.SetGuiObjectToLog(app.frame.GUI_log)
     logging.getLogger().addHandler(gui_log_handler)
 
+    #[CLS] matplot test
+    figure = app.frame.matplotlib_figure
+   
+    axes = figure.add_subplot(311)
+    import numpy as np
+    t = np.arange(0.0, 3.0, 0.1)
+    s = np.sin(2 * np.pi * t)
+    axes.plot(t,s,'.-')
+    app.frame.GUI_matplotlib_canvas.draw()
+
+    axes = figure.add_subplot(312)
+    import numpy as np
+    t = np.arange(0.0, 30.0, 0.01)
+    s = np.sin(2 * np.pi * t)
+    axes.plot(t,s)
+    app.frame.GUI_matplotlib_canvas.draw()
+
+    axes = figure.add_subplot(313)
+    import numpy as np
+    t = np.arange(0.0, 300.0, 0.01)
+    s = np.sin(2 * np.pi * t)
+    axes.plot(t,s)
+    app.frame.GUI_matplotlib_canvas.draw()
+
+
     #Enter App main loop
     app.MainLoop()
+
+
+
+
+
+
+
 
 
 
