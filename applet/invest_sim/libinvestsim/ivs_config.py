@@ -2,6 +2,7 @@
 from __future__ import print_function
 
 import os
+import logging
 from libcommon.json_config import JsonConfig
 
 
@@ -22,12 +23,12 @@ class IvsConfig(object):
         data["ssid_investsim_dry_run"] =  '1WfF20vvAjZqSrwiN1CAzxXGm6X_RGjjdduF0Kukv-o8'
 
         JsonConfig().SaveData(data, self.file_path)
-        print("[INFO]: config file saved: %s" % self.file_path)
+        logging.info("config file saved: %s" % self.file_path)
 
     def LoadConfig(self, file_path):
         self.file_path = file_path
         self.data = JsonConfig().Load(self.file_path)
-        print("[INFO]: config file loaded: %s" % self.file_path)
+        logging.info("config file loaded: %s" % self.file_path)
         return self.data
 
     def Show(self):
@@ -36,7 +37,7 @@ class IvsConfig(object):
 
     def SanityCheck(self):
         data = self.data
-        print("file check: %s is %s" % ( data["google_client_secret_file"], os.path.exists(data["google_client_secret_file"]) ))
+        logging.info("file check: %s is %s" % ( data["google_client_secret_file"], os.path.exists(data["google_client_secret_file"]) ))
 
 
     def secret_file(self):

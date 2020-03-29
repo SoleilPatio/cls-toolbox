@@ -3,6 +3,7 @@ from __future__ import print_function
 # import json
 import commentjson
 import codecs
+import logging
 
 class JsonConfig(object):
     def __init__(self):
@@ -26,7 +27,7 @@ class JsonConfig(object):
         self.ShowData(self.data)
 
     def ShowData(self, data):
-        print(commentjson.dumps(data, indent=4 , sort_keys=True).decode('unicode-escape'))
+        logging.info(commentjson.dumps(data, indent=4 , sort_keys=True).decode('unicode-escape'))
 
 
 if __name__ == '__main__':

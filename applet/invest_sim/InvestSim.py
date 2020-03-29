@@ -2,6 +2,10 @@
 from __future__ import print_function
 
 import os
+import logging
+from wxglade_out import *
+
+
 import json
 import matplotlib.pyplot as plt
 
@@ -11,14 +15,43 @@ from libinvestsim.ivs_policy import IvsPolicy
 from libinvestsim.libcommon.google_cloud_platform import *
 from libinvestsim.libcommon.json_config import JsonConfig
 
-
+#[Global Config]
 EXE_DIR = os.path.dirname(os.path.abspath(__file__))
 CONFIG_FILE = os.path.join(EXE_DIR, "config.json")
+logging.basicConfig(level=logging.DEBUG)
+
+class LoggingHandler(logging.StreamHandler):
+    def SetGuiObjectToLog(self, gui_log_obj):
+        self.gui_log_obj = gui_log_obj
+
+    def emit(self, record):
+
+        if( self.gui_log_obj ):
+            self.gui_log_obj.AppendText( "%s:%s:%s\n" % (record.levelname, record.module, self.format(record)) )
+
+        # print("format_msg=", self.format(record))
+        # print("message=", record.message)
+        # print("module=", record.module)
+        # print("filename=", record.filename)
+        # print("funcName=", record.funcName)
+        # print("lineno=", record.lineno)
+        # print("levelname=", record.levelname)
+        # print("name=", record.name)
+        # print("pathname=", record.pathname)
+        # print("processName=", record.processName)
+        # print("process=", record.process)
+        # print("threadName=", record.threadName)
+        # print("thread=", record.thread)
+
+# end of LoggingHandler
 
 
-class InvestSimApp(object):
+
+
+
+class InvestSimControl(object):
     def __init__(self):
-        super(InvestSimApp, self).__init__()
+        super(InvestSimControl, self).__init__()
         self.config = IvsConfig()  # IvsConfig Object
         self.gcp = None  # GoogleCloudPlatform object
         self.sheet_api = None  # GoogleSheetsApiService()
@@ -57,7 +90,8 @@ class InvestSimApp(object):
 
         for sheet_name in self.sheets_api.GetSheetNames():
             values = self.sheets_api.GetSheetValues(sheet_name)
-            print("[INFO]: loading %s daily track ..."%sheet_name)
+            # print("[INFO]: loading %s daily track ..."%sheet_name)
+            logging.info("loading %s daily track ..."%sheet_name)
             col_data = SheetRowDataToColumnData(values)
             # sheet_name is product name,use as index
             self.data[sheet_name] = col_data
@@ -82,22 +116,23 @@ class InvestSimApp(object):
 
     def Policy(self):
         for key in self.data:
-            print("[INFO]: calculate %s ..."%key)
+            logging.info("calculate %s ..."%key)
             out_dict = IvsPolicy().CalProduct(self.data[key] )
             
             out_json_filename = os.path.join( self.data_dir , "%s_out.json"%key )
-            print("[INFO]: save calculated output to %s ..." % out_json_filename )
+            logging.info("save calculated output to %s ..." % out_json_filename )
             JsonConfig().SaveData(out_dict, out_json_filename  )
 
             lat_json_filename = os.path.join( self.data_dir , "%s_late.json"%key )
             lat_dict = IvsPolicy().UtilKeepOnlyLatestRecord(out_dict)
-            print("[INFO]: save only latest output to %s ..." % lat_json_filename )
+            logging.info("save only latest output to %s ..." % lat_json_filename )
             JsonConfig().SaveData(lat_dict, lat_json_filename  )
 
             all_json_filename = os.path.join( self.data_dir , "%s_all.json"%key )
-            print("[INFO]: save all data to %s ..." % all_json_filename )
+            logging.info("save all data to %s ..." % all_json_filename )
             JsonConfig().SaveData(self.data[key], all_json_filename  )
 
+# end of class InvestSimControl
 
 
 
@@ -136,14 +171,57 @@ def OpenBroswer():
     webbrowser.open(
         'https://docs.google.com/spreadsheets/d/1i0Mr9BCpGDVyScA808_nTz70nM-oSo-T7gmBSxqFL-E/')
 
+# end of Test Code
+
+
+
+class MainFrame(MyFrame):
+    def __init__(self, *args, **kwds):
+        super(MainFrame, self).__init__(*args, **kwds)
+        #InvestSimControl
+        self.Control = InvestSimControl()
+
+    
+    def OnCloudLoad(self, event):  # wxGlade: MyFrame.<event_handler>
+        print("Event handler 'OnCloudLoad' 做好了！")
+
+        self.Control.Initial(CONFIG_FILE)
+        self.Control.LoadData()
+        self.Control.Policy()
+
+
+# end of class MainFrame
+
+class MyApp(wx.App):
+    def OnInit(self):
+        self.frame = MainFrame(None, wx.ID_ANY, "")
+        self.SetTopWindow(self.frame)
+        self.frame.Show()
+        return True
+
+# end of class MyApp
+
+if __name__ == "__main__":
+    app = MyApp(0)
+
+    #[CLS]: log to windows GUI object
+    gui_log_handler = LoggingHandler()
+    gui_log_handler.SetGuiObjectToLog(app.frame.GUI_log)
+    logging.getLogger().addHandler(gui_log_handler)
+
+    #Enter App main loop
+    app.MainLoop()
+
+
+
 
 if __name__ == '__main__':
 
-    MainApp = InvestSimApp()
+    # MainApp = InvestSimApp()
 
-    MainApp.Initial(CONFIG_FILE)
-    MainApp.LoadData()
-    MainApp.Policy()
+    # MainApp.Initial(CONFIG_FILE)
+    # MainApp.LoadData()
+    # MainApp.Policy()
 
     """
     Test: clear credential

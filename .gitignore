@@ -1,3 +1,6 @@
+#general
+*.bak
+
 #vscode
 .vscode/
 tempCodeRunnerFile*
@@ -10,3 +13,5 @@ tempCodeRunnerFile*
 
 #app
 applet/invest_sim/data
+
+
