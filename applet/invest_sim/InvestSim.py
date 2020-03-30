@@ -24,10 +24,17 @@ class LoggingHandler(logging.StreamHandler):
     def SetGuiObjectToLog(self, gui_log_obj):
         self.gui_log_obj = gui_log_obj
 
+    def SetGuiStatusbar(self, gui_statusbar_obj):
+        self.gui_statusbar_obj = gui_statusbar_obj
+
     def emit(self, record):
 
+        msg_formatted = self.format(record)
         if( self.gui_log_obj ):
-            self.gui_log_obj.AppendText( "%s:%s:%s\n" % (record.levelname, record.module, self.format(record)) )
+            self.gui_log_obj.AppendText( "%s:%s:%s\n" % (record.levelname, record.module, msg_formatted) )
+
+        if( self.gui_statusbar_obj ):
+            self.gui_statusbar_obj.SetStatusText(msg_formatted, i=2)
 
         # print("format_msg=", self.format(record))
         # print("message=", record.message)
@@ -183,11 +190,25 @@ class MainFrame(MyFrame):
 
     
     def OnCloudLoad(self, event):  # wxGlade: MyFrame.<event_handler>
-        print("Event handler 'OnCloudLoad' 做好了！")
-
+        self.GUI_statusbar.SetStatusText(r"讀取雲端資料中...", i=0)
         self.Control.Initial(CONFIG_FILE)
         self.Control.LoadData()
         self.Control.Policy()
+        self.GUI_statusbar.SetStatusText(r"雲端資料讀取完畢!", i=0)
+
+
+    def OnInputData(self, event):  # wxGlade: MyFrame.<event_handler>
+        import webbrowser
+        self.GUI_statusbar.SetStatusText(r"開啓Google試算表輸入資料", i=0)
+        webbrowser.open('https://docs.google.com/spreadsheets/d/1i0Mr9BCpGDVyScA808_nTz70nM-oSo-T7gmBSxqFL-E/')
+        webbrowser.open('https://docs.google.com/spreadsheets/d/1qJ0eT6sjo_f8dguSk7ccsd11v1o1BbR73LJUslur1W0/')
+        webbrowser.open('https://docs.google.com/spreadsheets/d/1WfF20vvAjZqSrwiN1CAzxXGm6X_RGjjdduF0Kukv-o8/')
+
+
+    def OnTest(self, event):  # wxGlade: MyFrame.<event_handler>
+        pass
+
+
 
 
 # end of class MainFrame
@@ -204,9 +225,10 @@ class MyApp(wx.App):
 if __name__ == "__main__":
     app = MyApp(0)
 
-    #[CLS]: log to windows GUI object
+    #[CLS]: Config GUI log/message object
     gui_log_handler = LoggingHandler()
     gui_log_handler.SetGuiObjectToLog(app.frame.GUI_log)
+    gui_log_handler.SetGuiStatusbar(app.frame.GUI_statusbar)
     logging.getLogger().addHandler(gui_log_handler)
 
     #[CLS] matplot test
