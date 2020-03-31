@@ -3,17 +3,10 @@ from __future__ import print_function
 
 import os
 import logging
+import matplotlib.pyplot as plt
+from libinvestsim.investsim_control import InvestSimControl
 from wxglade_out import *
 
-
-import json
-import matplotlib.pyplot as plt
-
-
-from libinvestsim.ivs_config import IvsConfig
-from libinvestsim.ivs_policy import IvsPolicy
-from libinvestsim.libcommon.google_cloud_platform import *
-from libinvestsim.libcommon.json_config import JsonConfig
 
 #[Global Config]
 EXE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -53,138 +46,19 @@ class LoggingHandler(logging.StreamHandler):
 # end of LoggingHandler
 
 
+def mpl_Plot(axes, y_values, line_style='.-'):
+    print("y_values=",y_values)
+    axes.plot(y_values,line_style)
 
 
 
-class InvestSimControl(object):
-    def __init__(self):
-        super(InvestSimControl, self).__init__()
-        self.config = IvsConfig()  # IvsConfig Object
-        self.gcp = None  # GoogleCloudPlatform object
-        self.sheet_api = None  # GoogleSheetsApiService()
-        self.data = {}  # whole data
-        self.data_dir = ""  #temp data directory
 
-    def Initial(self, config_file_name):
-        """
-        temp data directory
-        """
-        self.data_dir = os.path.join( os.path.dirname(config_file_name), "data" )
-        if not os.path.exists(self.data_dir):
-            os.makedirs(self.data_dir)
+#test
+count = 0
 
-        """
-        Load Config
-        """
-        # self.config.SaveDefaultConfig()
-        self.config.LoadConfig(config_file_name)
-        self.config.Show()
-
-        """
-        Connect Google API
-        """
-        self.gcp = GoogleCloudPlatform(self.config.secret_file())
-        self.sheets_api = self.gcp.GetGoogleSheetsApiService()
-
-    def LoadData(self):
-        self.loaddata_daily_track()
-        self.loaddata_data()
-        self.loaddata_dry_run()
-
-    def loaddata_daily_track(self):
-        self.sheets_api.OpenSpreadSheet(
-            self.config.spreadsheet_id_investsim_daily_track())
-
-        for sheet_name in self.sheets_api.GetSheetNames():
-            values = self.sheets_api.GetSheetValues(sheet_name)
-            # print("[INFO]: loading %s daily track ..."%sheet_name)
-            logging.info("loading %s daily track ..."%sheet_name)
-            col_data = SheetRowDataToColumnData(values)
-            # sheet_name is product name,use as index
-            self.data[sheet_name] = col_data
-
-    def loaddata_data(self):
-        self.sheets_api.OpenSpreadSheet(
-            self.config.spreadsheet_id_investsim_data())
-
-        sheet_name_list = self.sheets_api.GetSheetNames()
-        values = self.sheets_api.GetSheetValues( sheet_name_list[0])  # Use the 1st sheet to load product spec
-        dic_objs = SheetRowDataToDicObj(values)
-        for key in dic_objs:
-            if key in self.data:
-                self.data[key].update(dic_objs[key])
-            else:
-                self.data[key] = dic_objs[key]
-
-    def loaddata_dry_run(self):
-        self.sheets_api.OpenSpreadSheet(
-            self.config.spreadsheet_id_investsim_run())
-
-
-    def Policy(self):
-        for key in self.data:
-            logging.info("calculate %s ..."%key)
-            out_dict = IvsPolicy().CalProduct(self.data[key] )
-            
-            out_json_filename = os.path.join( self.data_dir , "%s_out.json"%key )
-            logging.info("save calculated output to %s ..." % out_json_filename )
-            JsonConfig().SaveData(out_dict, out_json_filename  )
-
-            lat_json_filename = os.path.join( self.data_dir , "%s_late.json"%key )
-            lat_dict = IvsPolicy().UtilKeepOnlyLatestRecord(out_dict)
-            logging.info("save only latest output to %s ..." % lat_json_filename )
-            JsonConfig().SaveData(lat_dict, lat_json_filename  )
-
-            all_json_filename = os.path.join( self.data_dir , "%s_all.json"%key )
-            logging.info("save all data to %s ..." % all_json_filename )
-            JsonConfig().SaveData(self.data[key], all_json_filename  )
-
-# end of class InvestSimControl
-
-
-
-class StockPrice(object):
-    def __init__(self):
-        self.start = 9800  # 股價開始
-        self.end = 7800  # 股價結束
-
-    def GetValues(self):
-        values = []
-        for price in range(self.start, self.end, 1 if self.end > self.start else -1):
-            values.append(price)
-        return values
-
-
-class FuturePosition(object):
-    def __init__(self):
-        pass
-
-    def ApplyPolicy(self, StockPrice):
-        add_range = StockPrice.start * 0.05  # 5% 加碼
-        positions = []
-        counter = 0
-        position = 0
-        for price in range(StockPrice.start, StockPrice.end, 1 if StockPrice.end > StockPrice.start else -1):
-            counter += 1
-            if counter % add_range == 0:
-                position += 1
-            positions.append(position)
-
-        return positions
-
-
-def OpenBroswer():
-    import webbrowser
-    webbrowser.open(
-        'https://docs.google.com/spreadsheets/d/1i0Mr9BCpGDVyScA808_nTz70nM-oSo-T7gmBSxqFL-E/')
-
-# end of Test Code
-
-
-
-class MainFrame(MyFrame):
+class InvestSimFrame(MyFrame):
     def __init__(self, *args, **kwds):
-        super(MainFrame, self).__init__(*args, **kwds)
+        super(InvestSimFrame, self).__init__(*args, **kwds)
         #InvestSimControl
         self.Control = InvestSimControl()
 
@@ -206,24 +80,47 @@ class MainFrame(MyFrame):
 
 
     def OnTest(self, event):  # wxGlade: MyFrame.<event_handler>
-        pass
+        global count
+        #[CLS] matplot test
+        figure = self.matplotlib_figure
+        axes_1 = figure.add_subplot(311)
+
+        count = (count+1)%4
+
+        if count == 0:
+            mpl_Plot(axes_1, self.Control.data["XINA50"][u"回合最大淨值"],"-")
+            logging.debug(u"回合最大淨值")
+        elif count == 1:
+            mpl_Plot(axes_1, self.Control.data["XINA50"][u"當日淨值"],".-")
+            logging.debug(u"當日淨值")
+        elif count == 2:
+            mpl_Plot(axes_1, self.Control.data["XINA50"][u"當日停損淨值"],"x-")
+            logging.debug(u"當日停損淨值")
+        else:
+            axes_1.cla()
+            logging.debug(u"clear")
+
+        self.GUI_matplotlib_canvas.draw() #[CLS] force update canvas
+
 
 
 
 
 # end of class MainFrame
 
-class MyApp(wx.App):
+class InvestSimApp(wx.App):
     def OnInit(self):
-        self.frame = MainFrame(None, wx.ID_ANY, "")
+        self.frame = InvestSimFrame(None, wx.ID_ANY, "")
         self.SetTopWindow(self.frame)
         self.frame.Show()
         return True
 
 # end of class MyApp
 
+
+
 if __name__ == "__main__":
-    app = MyApp(0)
+    app = InvestSimApp(0)
 
     #[CLS]: Config GUI log/message object
     gui_log_handler = LoggingHandler()
@@ -231,29 +128,29 @@ if __name__ == "__main__":
     gui_log_handler.SetGuiStatusbar(app.frame.GUI_statusbar)
     logging.getLogger().addHandler(gui_log_handler)
 
-    #[CLS] matplot test
-    figure = app.frame.matplotlib_figure
+    # #[CLS] matplot test
+    # figure = app.frame.matplotlib_figure
    
-    axes = figure.add_subplot(311)
-    import numpy as np
-    t = np.arange(0.0, 3.0, 0.1)
-    s = np.sin(2 * np.pi * t)
-    axes.plot(t,s,'.-')
-    app.frame.GUI_matplotlib_canvas.draw()
+    # axes = figure.add_subplot(311)
+    # import numpy as np
+    # t = np.arange(0.0, 3.0, 0.1)
+    # s = np.sin(2 * np.pi * t)
+    # axes.plot(t,s,'.-')
+    # app.frame.GUI_matplotlib_canvas.draw()
 
-    axes = figure.add_subplot(312)
-    import numpy as np
-    t = np.arange(0.0, 30.0, 0.01)
-    s = np.sin(2 * np.pi * t)
-    axes.plot(t,s)
-    app.frame.GUI_matplotlib_canvas.draw()
+    # axes = figure.add_subplot(312)
+    # import numpy as np
+    # t = np.arange(0.0, 30.0, 0.01)
+    # s = np.sin(2 * np.pi * t)
+    # axes.plot(t,s)
+    # app.frame.GUI_matplotlib_canvas.draw()
 
-    axes = figure.add_subplot(313)
-    import numpy as np
-    t = np.arange(0.0, 300.0, 0.01)
-    s = np.sin(2 * np.pi * t)
-    axes.plot(t,s)
-    app.frame.GUI_matplotlib_canvas.draw()
+    # axes = figure.add_subplot(313)
+    # import numpy as np
+    # t = np.arange(0.0, 300.0, 0.01)
+    # s = np.sin(2 * np.pi * t)
+    # axes.plot(t,s)
+    # app.frame.GUI_matplotlib_canvas.draw()
 
 
     #Enter App main loop
@@ -261,35 +158,4 @@ if __name__ == "__main__":
 
 
 
-
-
-
-
-
-
-
-
-if __name__ == '__main__':
-
-    # MainApp = InvestSimApp()
-
-    # MainApp.Initial(CONFIG_FILE)
-    # MainApp.LoadData()
-    # MainApp.Policy()
-
-    """
-    Test: clear credential
-    """
-    # gcp.ClearCredentials()
-
-    # stockprice = StockPrice()
-    # futureposition = FuturePosition()
-
-    # positions = futureposition.ApplyPolicy(stockprice)
-
-    # print(positions)
-
-    # # plt.plot(stockprice.GetValues(), ".")
-    # plt.plot(positions, "-")
-    # plt.show()
     print("\nDone")
