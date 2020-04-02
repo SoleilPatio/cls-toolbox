@@ -5,6 +5,7 @@ import os
 import logging
 import matplotlib.pyplot as plt
 from libinvestsim.investsim_control import InvestSimControl
+import libinvestsim.ivs_policy as policy 
 from wxglade_out import *
 
 
@@ -79,11 +80,96 @@ class InvestSimFrame(MyFrame):
         webbrowser.open('https://docs.google.com/spreadsheets/d/1WfF20vvAjZqSrwiN1CAzxXGm6X_RGjjdduF0Kukv-o8/')
 
 
+    def OnQuickApply(self, event):  # wxGlade: MyFrame.<event_handler>
+
+        #--------------------------------------------------------
+        #1. Get data from GUI
+        #--------------------------------------------------------
+        GUI_Data = {}
+        GUI_Data[u"產品"]=self.GUI_quick_product_sel.GetStringSelection()
+        GUI_Data[u"乘數"]=float(self.GUI_quick_multiplier.GetStringSelection())
+        GUI_Data[u"最大淨值"]=self.GUI_quick_max_netvalue.GetValue()*1000 #return float
+        GUI_Data[u"目前淨值"]=self.GUI_quick_current_netvalue.GetValue()*1000 #return float
+        GUI_Data[u"可損失比率"]=self.GUI_quick_stoploss_rate.GetValue() #return float
+        GUI_Data[u"目前價格"]=self.GUI_quick_current_price.GetValue() #return float
+
+        GUI_Data["TRIAL"]=[]
+
+        #Trial 1 ------------------------
+        Trial_Data={}
+        Trial_Data[u"目前口數"]=self.GUI_Q_T1_current_pos.GetValue()
+        Trial_Data[u"加碼價格"]=self.GUI_Q_T1_overweight_price.GetValue()
+        Trial_Data[u"加碼口數"]=self.GUI_Q_T1_overweight_pos.GetValue()
+        Trial_Data[u"分批次數"]=self.GUI_Q_T1_overweight_batches_num.GetValue()
+        GUI_Data["TRIAL"].append(Trial_Data)
+
+        #Trial 2 ------------------------
+        Trial_Data={}
+        Trial_Data[u"目前口數"]=self.GUI_Q_T2_current_pos.GetValue()
+        Trial_Data[u"加碼價格"]=self.GUI_Q_T2_overweight_price.GetValue()
+        Trial_Data[u"加碼口數"]=self.GUI_Q_T2_overweight_pos.GetValue()
+        Trial_Data[u"分批次數"]=self.GUI_Q_T2_overweight_batches_num.GetValue()
+        GUI_Data["TRIAL"].append(Trial_Data)
+
+        #Trial 3 ------------------------
+        Trial_Data={}
+        Trial_Data[u"目前口數"]=self.GUI_Q_T3_current_pos.GetValue()
+        Trial_Data[u"加碼價格"]=self.GUI_Q_T3_overweight_price.GetValue()
+        Trial_Data[u"加碼口數"]=self.GUI_Q_T3_overweight_pos.GetValue()
+        Trial_Data[u"分批次數"]=self.GUI_Q_T3_overweight_batches_num.GetValue()
+        GUI_Data["TRIAL"].append(Trial_Data)
+
+        #Trial 4 ------------------------
+        Trial_Data={}
+        Trial_Data[u"目前口數"]=self.GUI_Q_T4_current_pos.GetValue()
+        Trial_Data[u"加碼價格"]=self.GUI_Q_T4_overweight_price.GetValue()
+        Trial_Data[u"加碼口數"]=self.GUI_Q_T4_overweight_pos.GetValue()
+        Trial_Data[u"分批次數"]=self.GUI_Q_T4_overweight_batches_num.GetValue()
+        GUI_Data["TRIAL"].append(Trial_Data)
+
+        print("GUI_Data=",str(GUI_Data).decode('unicode-escape'))
+
+        
+        #--------------------------------------------------------
+        #2. Calculate
+        #--------------------------------------------------------
+        Stop_Data = []
+        for i in range(len(GUI_Data[u"TRIAL"])):
+            stop_data = policy.CalcStopPrice(  GUI_Data[u"最大淨值"], GUI_Data[u"目前淨值"], GUI_Data[u"可損失比率"], 
+                        GUI_Data[u"乘數"], 
+                        GUI_Data[u"目前價格"], GUI_Data[u"TRIAL"][i][u"加碼價格"],
+                        GUI_Data[u"TRIAL"][i][u"目前口數"], GUI_Data["TRIAL"][i][u"加碼口數"], GUI_Data[u"TRIAL"][i][u"分批次數"] )
+            Stop_Data.append(stop_data)
+
+        print("Stop_Data=",str(Stop_Data).decode('unicode-escape'))
+            
+
+        #--------------------------------------------------------
+        #3. Plot
+        #--------------------------------------------------------
+        figure = self.matplotlib_figure_2
+        figure.clf()
+        axes = figure.add_subplot(1,1,1)
+
+        for i, stop_data in enumerate(Stop_Data):
+            if stop_data:
+                axes.eventplot(stop_data[u"各次加碼價格"],orientation='vertical',lineoffsets=i+1,linelengths=0.2,
+                                colors='C{}'.format(i))
+
+
+        self.GUI_matplotlib_canvas_2.draw() #[CLS] force update canvas
+
+
+
+
+
     def OnTest(self, event):  # wxGlade: MyFrame.<event_handler>
         global count
         #[CLS] matplot test
         figure = self.matplotlib_figure
-        axes_1 = figure.add_subplot(311)
+
+        figure.clf()
+        axes_1 = figure.add_subplot(count+1,(count+2)%3+1,1)
 
         count = (count+1)%4
 
@@ -101,6 +187,9 @@ class InvestSimFrame(MyFrame):
             logging.debug(u"clear")
 
         self.GUI_matplotlib_canvas.draw() #[CLS] force update canvas
+
+
+       
 
 
 
