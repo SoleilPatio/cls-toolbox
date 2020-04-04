@@ -10,10 +10,19 @@ from libinvestsim.ivs_view_quicksim import IvsViewQuickSim
 from wxglade_out import *
 
 
-#[Global Config]
+"""
+========================================================
+[Global Config]
+========================================================
+"""
 EXE_DIR = os.path.dirname(os.path.abspath(__file__))
 CONFIG_FILE = os.path.join(EXE_DIR, "config.json")
 logging.basicConfig(level=logging.DEBUG)
+
+CACHE_DIR = os.path.join( EXE_DIR, "cache" )
+if not os.path.exists(CACHE_DIR):
+    os.makedirs(CACHE_DIR)
+
 
 
 """
@@ -72,7 +81,8 @@ class InvestSimFrame(MyFrame):
         #Control
         self.Control = InvestSimControl()
         #View: QuickSim
-        self.ViewQuickSim = IvsViewQuickSim()
+        self.ViewQuickSim = IvsViewQuickSim( cachedir=CACHE_DIR)
+        self.ViewQuickSim.RestoreGuiFromCache(self)
         #My event handler
         self.Bind(wx.EVT_CLOSE, self.OnClose)
 
