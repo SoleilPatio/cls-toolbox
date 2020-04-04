@@ -4,6 +4,7 @@
 #vscode
 .vscode/
 tempCodeRunnerFile*
+.favorites.json
 
 #LFK
 *_MTK/
@@ -13,5 +14,6 @@ tempCodeRunnerFile*
 
 #app
 applet/invest_sim/data
+
 
 
