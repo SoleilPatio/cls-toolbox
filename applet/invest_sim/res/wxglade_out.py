@@ -97,7 +97,11 @@ class MyFrame(wx.Frame):
 
     def __set_properties(self):
         # begin wxGlade: MyFrame.__set_properties
+<<<<<<< HEAD:applet/invest_sim/res/wxglade_out.py
         self.SetTitle("InvestSim (Pre-Alpha)")
+=======
+        self.SetTitle("InvestSim")
+>>>>>>> 81ae04a11aaccef0688e925ee27808a082494451:applet/invest_sim/wxglade_out.py
         _icon = wx.NullIcon
         _icon.CopyFromBitmap(wx.Bitmap(os.path.join(RES_DIR,"icon-nobita-50x50.jpg"), wx.BITMAP_TYPE_ANY))
         self.SetIcon(_icon)
