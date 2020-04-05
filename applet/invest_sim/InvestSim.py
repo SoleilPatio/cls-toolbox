@@ -83,6 +83,7 @@ class InvestSimFrame(MyFrame):
         #View: QuickSim
         self.ViewQuickSim = IvsViewQuickSim( cachedir=CACHE_DIR)
         self.ViewQuickSim.RestoreGuiFromCache(self)
+        self.OnQuickSimApply(None)
         #My event handler
         self.Bind(wx.EVT_CLOSE, self.OnClose)
 
