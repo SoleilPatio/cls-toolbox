@@ -1,0 +1,1 @@
+mklink /h InvestSim.pym InvestSim.py

@@ -20,6 +20,9 @@ class IvsViewQuickSim(object):
         if self.cache_dir:
             self.cache_file = os.path.join(self.cache_dir, "cache_view_quicksim.json")
 
+    def cache_file_product(self, productname):
+        return os.path.join(self.cache_dir, "cache_view_quicksim-%s.json"%productname)
+
 
 
     def GuiDataSync(self, GUI_Data, Frame, direction):
@@ -55,9 +58,9 @@ class IvsViewQuickSim(object):
             Trial_Data = GUI_Data["TRIAL"][0]
 
         util.WxWidgetDataSync( Trial_Data, u"目前口數", Frame.GUI_Q_T1_current_pos, direction )
-        util.WxWidgetDataSync( Trial_Data, u"加碼價格", Frame.GUI_Q_T1_overweight_price, direction )
-        util.WxWidgetDataSync( Trial_Data, u"加碼口數", Frame.GUI_Q_T1_overweight_pos, direction )
-        util.WxWidgetDataSync( Trial_Data, u"分批次數", Frame.GUI_Q_T1_overweight_batches_num, direction )
+        util.WxWidgetDataSync( Trial_Data, u"加碼價格", Frame.GUI_Q_T1_avg_buy_price, direction )
+        util.WxWidgetDataSync( Trial_Data, u"加碼口數", Frame.GUI_Q_T1_avg_buy_pos, direction )
+        util.WxWidgetDataSync( Trial_Data, u"分批次數", Frame.GUI_Q_T1_avg_buy_count, direction )
 
         if direction == 'from': #Read operation
             GUI_Data["TRIAL"].append(Trial_Data)
@@ -69,9 +72,9 @@ class IvsViewQuickSim(object):
             Trial_Data = GUI_Data["TRIAL"][1]
 
         util.WxWidgetDataSync( Trial_Data, u"目前口數", Frame.GUI_Q_T2_current_pos, direction )
-        util.WxWidgetDataSync( Trial_Data, u"加碼價格", Frame.GUI_Q_T2_overweight_price, direction )
-        util.WxWidgetDataSync( Trial_Data, u"加碼口數", Frame.GUI_Q_T2_overweight_pos, direction )
-        util.WxWidgetDataSync( Trial_Data, u"分批次數", Frame.GUI_Q_T2_overweight_batches_num, direction )
+        util.WxWidgetDataSync( Trial_Data, u"加碼價格", Frame.GUI_Q_T2_avg_buy_price, direction )
+        util.WxWidgetDataSync( Trial_Data, u"加碼口數", Frame.GUI_Q_T2_avg_buy_pos, direction )
+        util.WxWidgetDataSync( Trial_Data, u"分批次數", Frame.GUI_Q_T2_avg_buy_count, direction )
 
         if direction == 'from': #Read operation
             GUI_Data["TRIAL"].append(Trial_Data)
@@ -83,9 +86,9 @@ class IvsViewQuickSim(object):
             Trial_Data = GUI_Data["TRIAL"][2]
 
         util.WxWidgetDataSync( Trial_Data, u"目前口數", Frame.GUI_Q_T3_current_pos, direction )
-        util.WxWidgetDataSync( Trial_Data, u"加碼價格", Frame.GUI_Q_T3_overweight_price, direction )
-        util.WxWidgetDataSync( Trial_Data, u"加碼口數", Frame.GUI_Q_T3_overweight_pos, direction )
-        util.WxWidgetDataSync( Trial_Data, u"分批次數", Frame.GUI_Q_T3_overweight_batches_num, direction )
+        util.WxWidgetDataSync( Trial_Data, u"加碼價格", Frame.GUI_Q_T3_avg_buy_price, direction )
+        util.WxWidgetDataSync( Trial_Data, u"加碼口數", Frame.GUI_Q_T3_avg_buy_pos, direction )
+        util.WxWidgetDataSync( Trial_Data, u"分批次數", Frame.GUI_Q_T3_avg_buy_count, direction )
 
         if direction == 'from': #Read operation
             GUI_Data["TRIAL"].append(Trial_Data)
@@ -97,9 +100,9 @@ class IvsViewQuickSim(object):
             Trial_Data = GUI_Data["TRIAL"][3]
 
         util.WxWidgetDataSync( Trial_Data, u"目前口數", Frame.GUI_Q_T4_current_pos, direction )
-        util.WxWidgetDataSync( Trial_Data, u"加碼價格", Frame.GUI_Q_T4_overweight_price, direction )
-        util.WxWidgetDataSync( Trial_Data, u"加碼口數", Frame.GUI_Q_T4_overweight_pos, direction )
-        util.WxWidgetDataSync( Trial_Data, u"分批次數", Frame.GUI_Q_T4_overweight_batches_num, direction )
+        util.WxWidgetDataSync( Trial_Data, u"加碼價格", Frame.GUI_Q_T4_avg_buy_price, direction )
+        util.WxWidgetDataSync( Trial_Data, u"加碼口數", Frame.GUI_Q_T4_avg_buy_pos, direction )
+        util.WxWidgetDataSync( Trial_Data, u"分批次數", Frame.GUI_Q_T4_avg_buy_count, direction )
 
         if direction == 'from': #Read operation
             GUI_Data["TRIAL"].append(Trial_Data)
@@ -109,15 +112,25 @@ class IvsViewQuickSim(object):
 
 
     def RestoreGuiFromCache(self, Frame):
-        if not os.path.isfile(self.cache_file):
+        self.RestoreGuiFromCacheFromJson(Frame, self.cache_file)
+
+    def RestoreGuiFromCacheByProduct(self, Frame, productname):
+        self.RestoreGuiFromCacheFromJson(Frame, self.cache_file_product(productname))
+
+    def RestoreGuiFromCacheFromJson(self, Frame, json_file):
+        if not os.path.isfile(json_file):
+            logging.warn("no cached file found:%s"%json_file)
             return
         #Load cached setting from file
-        GUI_Data=util.LoadObjFromJson(self.cache_file)
+        GUI_Data=util.LoadObjFromJson(json_file)
         #Restore setting to GUI
         self.GuiDataSync(GUI_Data, Frame, direction='to')
 
-
-
+    """
+    --------------------------------------------------------
+    Read GUI input data to GUI_Data object and return
+    --------------------------------------------------------
+    """
     def LoadGuiData(self, Frame):
         #Read data from GUI
         GUI_Data = {}
@@ -153,30 +166,55 @@ class IvsViewQuickSim(object):
         #--------------------------------------------------------
         #3. Plot
         #--------------------------------------------------------
-        Figure.clf()
-        axes = Figure.add_subplot(1,1,1)
-
         M_LINELENGTH = 0.2
 
+        Figure.clf()
+        axes = Figure.add_subplot(1,1,1)
+        axes.grid(axis='y', alpha=0.8, linewidth=0.5, linestyle=':')
+
+        #Current Price
+        axes.axhline(GUI_Data[u"目前價格"], ls='-', color='C8', alpha=0.1, lw=5, zorder = 0) #current price
+
+
+        #For each Trial
         for i, stop_data in enumerate(Stop_Data):
             if stop_data:
-                data_list = stop_data[u"各次加碼價格"]
-                color = 'C{}'.format(i)
-                X = i+1
-                axes.eventplot( data_list, 
-                                orientation='vertical', lineoffsets=X, linelengths=M_LINELENGTH, 
-                                linewidths=0.3,
-                                colors=color) #colors='C0','C1','C2',....,'C9'
-                axes.plot(X, data_list[0],  'o', color=color) #Start overweight
-                axes.plot(X, data_list[-1], 'x', color=color) #STOP point
+                avg_buy_price_list = stop_data[u"各次加碼價格"]
+                avg_buy_pos_list = stop_data[u"各次加碼口數"]
+                avg_buy_pos_ttl_list = stop_data[u"各次加碼總口數"]
+                sign = stop_data[u"多空"]
 
-                #text: point
-                for i, data in enumerate(data_list):
-                    text_price=format(data,".1f")
-                    if i == len(data_list)-1:
-                        text_price += u"(STOP)"
-                    axes.text(X + M_LINELENGTH/2, data, text_price, color=color)
-                    axes.text(X - M_LINELENGTH/2, data, "+2", color=color, horizontalalignment="right")
+                color = 'C{}'.format(i)
+                X = i+1 #X-axis value
+                axes.eventplot( avg_buy_price_list, 
+                                orientation='vertical', lineoffsets=X, linelengths=M_LINELENGTH, 
+                                linewidths=0.8,
+                                colors=color) #colors='C0','C1','C2',....,'C9'
+                if sign > 0:
+                    axes.plot(X, avg_buy_price_list[0],  'v', color=color) #Start avg_buy
+                else:
+                    axes.plot(X, avg_buy_price_list[0],  '^', color=color) #Start avg_buy
+                
+                axes.plot(X, avg_buy_price_list[-1], 'x', color=color) #STOP point
+
+                #text: price
+                for i, y_price in enumerate(avg_buy_price_list):
+                    change = y_price-GUI_Data[u"目前價格"]
+                    change_p = format((change/GUI_Data[u"目前價格"])*100,".1f")
+                    text_price="%s(%s%%/%d)"%( format(y_price,".1f"), change_p, change )
+                    axes.text(X + M_LINELENGTH/2, y_price, text_price, color=color)
+                    
+                    #text: position info
+                    if i != len(avg_buy_price_list)-1:
+                        text_pos = "%+d(%d)"%(avg_buy_pos_list[i],avg_buy_pos_ttl_list[i]) 
+                        axes.text(X - M_LINELENGTH/2, y_price, text_pos, color=color, horizontalalignment="right")
+                    else:
+                        text_pos = u"(STOP)"
+                        axes.text(X - M_LINELENGTH/2, y_price, text_pos, color=color, horizontalalignment="right", 
+                                    bbox=dict(facecolor=color, alpha=0.2) )
+                    
+                
+
 
 
         Canvas.draw() #[CLS] force update canvas
@@ -187,5 +225,6 @@ class IvsViewQuickSim(object):
         #--------------------------------------------------------
         if self.cache_file:
             util.SaveObjToJson(GUI_Data, self.cache_file)
+            util.SaveObjToJson(GUI_Data, self.cache_file_product(GUI_Data[u"產品"]))
 
 
