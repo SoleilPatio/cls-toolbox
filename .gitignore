@@ -11,7 +11,10 @@ tempCodeRunnerFile*
 
 #python
 *.pyc
+build/
+dist/
 
 #app
 applet/invest_sim/data
 applet/invest_sim/cache
+applet/invest_sim-shihpin/

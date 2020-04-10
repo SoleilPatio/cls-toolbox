@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 import logging
-# import json
-import commentjson
+import json
+# import commentjson  as json #commentjson cannot be pyinstaller
 import codecs
 
 
@@ -17,12 +17,12 @@ def StrObj(obj):
     # sometimes error: 
     #           UnicodeEncodeError: 'ascii' codec can't encode characters in position 7-8: ordinal not in range(128)
     #........................................................
-    # return commentjson.dumps(obj, indent=4 , sort_keys=True).decode('unicode-escape')
+    # return json.dumps(obj, indent=4 , sort_keys=True).decode('unicode-escape')
 
     #........................................................
     # encode to utf-8 before output for print.
     #........................................................
-    return commentjson.dumps(obj, indent=4 , sort_keys=True).decode('unicode-escape').encode('utf-8')
+    return json.dumps(obj, indent=4 , sort_keys=True).decode('unicode-escape').encode('utf-8')
 
 """
 --------------------------------------------------------
@@ -31,7 +31,7 @@ Save ANY object to json
 """
 def SaveObjToJson(obj, json_file_name):
     with codecs.open(json_file_name, 'w' , encoding='utf-8') as outfile:
-        commentjson.dump(obj, outfile, indent=4 , ensure_ascii=False, sort_keys=True)
+        json.dump(obj, outfile, indent=4 , ensure_ascii=False, sort_keys=True)
 
 """
 --------------------------------------------------------
@@ -40,7 +40,7 @@ Load ANY object from json
 """
 def LoadObjFromJson(json_file_name):
     with open(json_file_name) as infile:
-        obj = commentjson.load(infile)
+        obj = json.load(infile)
     return obj
 
 
