@@ -1,6 +1,6 @@
-'''
-@author: MTK02679
-'''
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 import datetime
 import time
 
@@ -63,5 +63,5 @@ class DayCode(object):
 
 
 if __name__ == '__main__':
-    print DayCode().to_yyyymmddHHMM()
+    print(DayCode().to_yyyymmddHHMM())
     pass
