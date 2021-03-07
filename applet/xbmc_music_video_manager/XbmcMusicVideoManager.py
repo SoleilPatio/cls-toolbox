@@ -10,6 +10,7 @@ import sys
 import os
 import codecs
 import re
+import textwrap
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
 import libpython.core as core
@@ -43,10 +44,16 @@ def GenerateNFO( video_file_name ):
     
     file_status = fileinfo.check_file_status(video_file_name)
     filename_no_ext = file_status.get("fn_noext","")
-    mo = re.match(r"((\d+)\s*-)?\s*([^-]*)\s*-\s*(.*)", filename_no_ext)
+    # print("video_file_name=",video_file_name)
+    mo = re.match(r"((\d+)\s*-)?\s*([^-]*)\s*-\s*([^-]*)(\s*-\s*\[(.*)\])?", filename_no_ext)
     if mo:
-        artist_name = mo.group(3)
-        title_name = mo.group(4)
+        # print("mo=",mo.groups())
+        artist_name = mo.group(3).strip()
+        title_name = mo.group(4).strip()
+        options_str = mo.group(6)
+        if options_str and "no_nfo" in options_str: #bypass filename that contains "no_nfo"
+            return
+
     album_name = file_status.get("fn_parent_dirname","")
 
     
@@ -79,12 +86,19 @@ def GenerateNFO( video_file_name ):
 
 if __name__ == "__main__":
     
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        prog='XBMC Music Video Manager',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=textwrap.dedent('''\
+            additional information:
+                1. file name ends with "- [no_nfo]" will be ignored.
+            '''))
     parser.add_argument("dir", help="music video directories")
     parser.add_argument("-r",  action="store_true", help="recursive process")
     
     # args = parser.parse_args([r"\\MNEMOSYNE\\NDK-Data\\DB_AV_多媒體資料\\VIDEO_影片\\[MUSIC VIDEOS]\\周慧敏 - あなたへのラヴ・ソング（你的最愛．周慧敏） (LD) 1995.02.25 - 複製"])
     # args = parser.parse_args([r"\\MNEMOSYNE\\NDK-Data\DB_AV_多媒體資料\\VIDEO_影片\\[MUSIC VIDEOS]"])
+    # args = parser.parse_args([r"C:\\APN\\USERS\\clouds\\LocalPicture\\Screen Capture\\SC-LOCAL\\周慧敏 - 一萬天荒愛未老演唱會 (2018)"])
     args = parser.parse_args() #[NOTE]: Normal Mode
 
     print("args = ", args)
