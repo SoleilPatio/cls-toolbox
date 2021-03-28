@@ -87,7 +87,7 @@ def GenerateNFO( video_file_name ):
 if __name__ == "__main__":
     
     parser = argparse.ArgumentParser(
-        prog='XBMC Music Video Manager',
+        prog='XBMC Music Video Helper',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=textwrap.dedent('''\
             additional information:
