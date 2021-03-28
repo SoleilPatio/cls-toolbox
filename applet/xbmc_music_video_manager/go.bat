@@ -1,4 +1,4 @@
 
 REM [Note] Big-5 encode
-python XbmcMusicVideoManager.py -r "C:\APN\MNEMOSYNE\NDK-Data\DB_AV_¦h´CÅé¸ê®Æ\VIDEO_¼v¤ù\[MUSIC VIDEOS]"
-python XbmcMusicVideoManager.py -r "C:\APN\MNEMOSYNE\NDK-Data\DB_AV_¦h´CÅé¸ê®Æ\VIDEO_¼v¤ù\[MUSIC VIDEOS] - KIDS"
+python XbmcMusicVideoHelper.py -r "C:\APN\MNEMOSYNE\NDK-Data\DB_AV_ï¿½hï¿½Cï¿½ï¿½ï¿½ï¿½\VIDEO_ï¿½vï¿½ï¿½\[MUSIC VIDEOS]"
+python XbmcMusicVideoHelper.py -r "C:\APN\MNEMOSYNE\NDK-Data\DB_AV_ï¿½hï¿½Cï¿½ï¿½ï¿½ï¿½\VIDEO_ï¿½vï¿½ï¿½\[MUSIC VIDEOS] - KIDS"
