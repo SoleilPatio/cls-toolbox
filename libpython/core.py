@@ -23,6 +23,32 @@ def ExceptionStr(self):
 Log utility
 -----------------------------------------------
 """
+def LogInitial(main_file_path, level=logging.DEBUG):
+    #...................................
+    #prepare Output directory
+    #...................................
+    # OUT_DIR = os.path.join( os.getcwd(), "out" )
+    OUT_DIR = os.path.join( os.path.dirname(os.path.abspath(main_file_path)) , "out" )
+    if not os.path.exists(OUT_DIR):
+        try:
+            os.makedirs(OUT_DIR)
+        except OSError as exc: # Guard against race condition
+            if exc.errno != errno.EEXIST:
+                raise
+    #...................................
+    #logger 
+    #...................................
+    exe_log_filename = os.path.join(OUT_DIR, 'execution.log' )
+    logging.basicConfig(filename=exe_log_filename, filemode='w', 
+        level=logging.DEBUG
+        # level=logging.INFO
+        )
+    
+    LogInfo("OUT_DIR= %s" % OUT_DIR)
+    LogInfo("exe_log_filename= %s" % exe_log_filename)
+
+    return OUT_DIR
+
 def Log( msg, stdout = True ):
     print(msg) if stdout else None
     logging.info(msg)
