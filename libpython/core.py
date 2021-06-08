@@ -84,26 +84,34 @@ def StrObj(obj):
     # ensure_ascii=False : no \u for utf-8
     #........................................................
     # return json.dumps(obj, indent=4 , sort_keys=True).decode('unicode-escape').encode('utf-8')
-    return json.dumps(obj, indent=4 , sort_keys=True,  ensure_ascii=False)
+    # return json.dumps(obj, indent=4 , sort_keys=True,  ensure_ascii=False)
+    #Python 2
+    # return json.dumps(obj, indent=4 , sort_keys=True).decode('unicode-escape').encode('utf-8')
+    #Python 3
+    return json.dumps(obj, indent=4 , sort_keys=True, ensure_ascii=False, default=lambda o: vars(o) ) #ensure_ascii=false for non-ascii character
 
-"""
---------------------------------------------------------
-Save ANY object to json
---------------------------------------------------------
-"""
-def SaveObjToJson(obj, json_file_name):
+
+def SaveToJsonFile(obj, json_file_name):
+    pathlib.Path(json_file_name).parent.mkdir(parents=True, exist_ok=True)
     with codecs.open(json_file_name, 'w' , encoding='utf-8') as outfile:
-        json.dump(obj, outfile, indent=4 , ensure_ascii=False, sort_keys=True)
+        json.dump(obj, outfile, indent=4 , ensure_ascii=False, sort_keys=True, default=lambda o: vars(o)) #Good
+        return
 
-"""
---------------------------------------------------------
-Load ANY object from json
---------------------------------------------------------
-"""
-def LoadObjFromJson(json_file_name):
-    with open(json_file_name) as infile:
-        obj = json.load(infile)
-    return obj
+def LoadFromJsonFile(json_file_name):
+    with codecs.open(json_file_name, 'r' , encoding='utf-8') as infile:
+        json_loaded = json.load(infile)
+        return json_loaded
+                
+def SaveToPickleFile(obj, pickle_file_name):
+    pathlib.Path(pickle_file_name).parent.mkdir(parents=True, exist_ok=True)
+    with open(pickle_file_name, 'wb') as outfile:
+        pickle.dump(obj, outfile, protocol=pickle.HIGHEST_PROTOCOL)
+        return
+
+def LoadFromPickleFile(pickle_file_name):
+    with open(pickle_file_name, 'rb') as infile:
+        pickle_loaded = pickle.load(infile)
+        return pickle_loaded
 
 
 
@@ -150,6 +158,34 @@ def RunCommand( command_line, input_str = None, text_mode = True ):
     ret_code = output.returncode
     return (ret_code, std_out, std_err)
 
+def LoadPythonModule( python_src_file ):
+    py_src = pathlib.Path(python_src_file)
+    sys.path.append(str(py_src.parent))    #add module directory to  path
+    module_name = py_src.stem
+    module = importlib.import_module(module_name)
+    return module
+
+"""
+-----------------------------------------------
+Find the nearest specific file, usually setting file
+-----------------------------------------------
+"""
+
+def FindNearestFile( start_position, file_name ):
+    import os
+    from pathlib import Path
+
+    start_position = os.path.abspath(start_position)
+    parents = [ str(x) for x in Path(start_position).parents ]
+
+    # LogInfo("start_position = %s" % start_position)
+    for path in parents:
+        test_file_name = os.path.join(path, file_name)
+        # LogInfo("test_file_name = %s" % test_file_name)
+        if os.path.isfile(test_file_name):
+            LogInfo("file found: %s" % test_file_name)
+            return test_file_name
+    return None
 
 
 """
