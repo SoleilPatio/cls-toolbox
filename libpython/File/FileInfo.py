@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
-from libpython.Utils.DayCode import DayCode
+from libPython.Utils.DayCode import DayCode
 
 
 def list_all_files(ret_files, dirname, ext_list, b_recursive ):

@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 import os
+import sys
 import logging
-import json
-# import commentjson  as json #commentjson cannot be pyinstaller
+import pickle
+import pathlib
+# import json
+import commentjson  as json #commentjson cannot be pyinstaller
 import codecs
 import subprocess
 import traceback
@@ -252,8 +255,8 @@ if __name__ == '__main__':
     data = [u"中文",u"好棒棒"]
     print("data=", StrObj(data))
 
-    SaveObjToJson(data, "test.json" )
+    SaveToJsonFile(data, "test.json" )
 
-    data2 = LoadObjFromJson("test.json")
+    data2 = LoadFromJsonFile("test.json")
     print("data2=", StrObj(data2))
 

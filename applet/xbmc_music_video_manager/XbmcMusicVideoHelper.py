@@ -13,8 +13,8 @@ import re
 import textwrap
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
-import libpython.core as core
-import libpython.File.FileInfo as fileinfo
+import libPython.core.util as core
+import libPython.File.FileInfo as fileinfo
 
 
 
