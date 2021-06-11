@@ -1,11 +1,13 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 from __future__ import print_function
+if __name__ == '__main__': import _libpythonpath_ # Add libPython\.. into PYTHONPATH when unittest
 
 import os
-import openpyxl
 import string
-import util
+
+import libPython.core.util as util
+import openpyxl
 
 
 class ExcelfileOpenpyxl(object):
