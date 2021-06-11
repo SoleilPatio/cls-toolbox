@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 from __future__ import print_function
-if __name__ == '__main__': import _libpythonpath_ # Add libPython\.. into PYTHONPATH when unittest
+if __name__ == '__main__': import _libpythonpath_ #type: ignore (Add libPython\.. into PYTHONPATH when unittest )
 
 import os
 import string
