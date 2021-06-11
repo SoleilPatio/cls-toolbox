@@ -173,6 +173,22 @@ def LoadPythonModule( python_src_file ):
     module = importlib.import_module(module_name)
     return module
 
+def SaveToProperPltfig(plt, ref_file_name):
+    out_jpg_file_name = pathlib.Path(ref_file_name).parent / "out" /  ( pathlib.Path(ref_file_name).stem + "_out.jpg" )
+    pathlib.Path(out_jpg_file_name).parent.mkdir(parents=True, exist_ok=True)
+    plt.savefig( out_jpg_file_name)
+    msg = "jpg saved: %s" % out_jpg_file_name
+    print(msg)
+    logging.info(msg)
+
+def SaveToProperPickle(obj, ref_file_name):
+    out_pickle_file_name = pathlib.Path(ref_file_name).parent / "out" /  ( pathlib.Path(ref_file_name).stem + "_out.pickle" )
+    pathlib.Path(out_pickle_file_name).parent.mkdir(parents=True, exist_ok=True)
+    SaveToPickleFile( obj, out_pickle_file_name )
+    msg = "pickle saved: %s" % out_pickle_file_name
+    print(msg)
+    logging.info(msg)
+
 """
 -----------------------------------------------
 Find the nearest specific file, usually setting file
