@@ -11,11 +11,12 @@ import codecs
 import subprocess
 import traceback
 import errno
+import importlib
 
 
 """
 -----------------------------------------------
-
+Exception
 -----------------------------------------------
 """
 def ExceptionStr(self):
@@ -23,7 +24,7 @@ def ExceptionStr(self):
 
 """
 -----------------------------------------------
-Log utility
+Log Utilities
 -----------------------------------------------
 """
 def LogInitial(main_file_path, level=logging.DEBUG):
@@ -33,11 +34,7 @@ def LogInitial(main_file_path, level=logging.DEBUG):
     # OUT_DIR = os.path.join( os.getcwd(), "out" )
     OUT_DIR = os.path.join( os.path.dirname(os.path.abspath(main_file_path)) , "out" )
     if not os.path.exists(OUT_DIR):
-        try:
-            os.makedirs(OUT_DIR)
-        except OSError as exc: # Guard against race condition
-            if exc.errno != errno.EEXIST:
-                raise
+        CreateDir(OUT_DIR)
     #...................................
     #logger 
     #...................................
@@ -49,7 +46,6 @@ def LogInitial(main_file_path, level=logging.DEBUG):
     
     LogInfo("OUT_DIR= %s" % OUT_DIR)
     LogInfo("exe_log_filename= %s" % exe_log_filename)
-
     return OUT_DIR
 
 def Log( msg, stdout = True ):
@@ -71,33 +67,18 @@ def LogError( msg, stdout = True  ):
 
 """
 --------------------------------------------------------
-Return printable string of ANY object
-    1. support URF-8 key name
+Printable/Readable/Loadable Utilities
 --------------------------------------------------------
 """
-def StrObj(obj):
-    #........................................................
-    # sometimes error: 
-    #           UnicodeEncodeError: 'ascii' codec can't encode characters in position 7-8: ordinal not in range(128)
-    #........................................................
-    # return json.dumps(obj, indent=4 , sort_keys=True).decode('unicode-escape')
-
-    #........................................................
-    # encode to utf-8 before output for print.
-    # ensure_ascii=False : no \u for utf-8
-    #........................................................
-    # return json.dumps(obj, indent=4 , sort_keys=True).decode('unicode-escape').encode('utf-8')
-    # return json.dumps(obj, indent=4 , sort_keys=True,  ensure_ascii=False)
-    #Python 2
-    # return json.dumps(obj, indent=4 , sort_keys=True).decode('unicode-escape').encode('utf-8')
-    #Python 3
-    return json.dumps(obj, indent=4 , sort_keys=True, ensure_ascii=False, default=lambda o: vars(o) ) #ensure_ascii=false for non-ascii character
-
 def _save_to_json_process_(obj):
     try:
         return vars(obj)
     except:
         return f"<<non-serializable: {type(obj).__qualname__}>>"
+
+def StrObj(obj):
+    return json.dumps(obj, indent=4 , sort_keys=True, ensure_ascii=False, default=_save_to_json_process_ ) #ensure_ascii=false for non-ascii character
+
 
 def SaveToJsonFile(obj, json_file_name, sort_keys=True):
     pathlib.Path(json_file_name).parent.mkdir(parents=True, exist_ok=True)
@@ -121,6 +102,32 @@ def LoadFromPickleFile(pickle_file_name):
         pickle_loaded = pickle.load(infile)
         return pickle_loaded
 
+    
+"""
+--------------------------------------------------------
+Save Proper Utilities
+--------------------------------------------------------
+"""
+def SaveToProperJson(obj, ref_file_name):
+    out_json_file_name = pathlib.Path(ref_file_name).parent / "out" /  ( pathlib.Path(ref_file_name).stem + "_out.json" )
+    pathlib.Path(out_json_file_name).parent.mkdir(parents=True, exist_ok=True)
+    SaveToJsonFile( obj, out_json_file_name )
+    msg = "json saved: %s" % out_json_file_name
+    LogInfo(msg)
+
+def SaveToProperPickle(obj, ref_file_name):
+    out_pickle_file_name = pathlib.Path(ref_file_name).parent / "out" /  ( pathlib.Path(ref_file_name).stem + "_out.pickle" )
+    pathlib.Path(out_pickle_file_name).parent.mkdir(parents=True, exist_ok=True)
+    SaveToPickleFile( obj, out_pickle_file_name )
+    msg = "pickle saved: %s" % out_pickle_file_name
+    LogInfo(msg)
+
+def SaveToProperPltfig(plt, ref_file_name):
+    out_jpg_file_name = pathlib.Path(ref_file_name).parent / "out" /  ( pathlib.Path(ref_file_name).stem + "_out.jpg" )
+    pathlib.Path(out_jpg_file_name).parent.mkdir(parents=True, exist_ok=True)
+    plt.savefig( out_jpg_file_name)
+    msg = "jpg saved: %s" % out_jpg_file_name
+    LogInfo(msg)
 
 
 """
@@ -128,7 +135,6 @@ def LoadFromPickleFile(pickle_file_name):
 Create OUT directory
 -----------------------------------------------
 """
-
 def CreateDir( dir_name):
     if not os.path.exists(dir_name):
         try:
@@ -145,7 +151,7 @@ def CreateDefaultOutDir( self, out_dir="out"):
 
 """
 -----------------------------------------------
-Execute Command
+Execute Command Utilities
     text_mode : True  => text mode , under linux
                 False => UTF-8 mode, under windows
 -----------------------------------------------
@@ -166,6 +172,11 @@ def RunCommand( command_line, input_str = None, text_mode = True ):
     ret_code = output.returncode
     return (ret_code, std_out, std_err)
 
+"""
+-----------------------------------------------
+Load Python Module
+-----------------------------------------------
+"""
 def LoadPythonModule( python_src_file ):
     py_src = pathlib.Path(python_src_file)
     sys.path.append(str(py_src.parent))    #add module directory to  path
@@ -173,34 +184,15 @@ def LoadPythonModule( python_src_file ):
     module = importlib.import_module(module_name)
     return module
 
-def SaveToProperPltfig(plt, ref_file_name):
-    out_jpg_file_name = pathlib.Path(ref_file_name).parent / "out" /  ( pathlib.Path(ref_file_name).stem + "_out.jpg" )
-    pathlib.Path(out_jpg_file_name).parent.mkdir(parents=True, exist_ok=True)
-    plt.savefig( out_jpg_file_name)
-    msg = "jpg saved: %s" % out_jpg_file_name
-    print(msg)
-    logging.info(msg)
-
-def SaveToProperPickle(obj, ref_file_name):
-    out_pickle_file_name = pathlib.Path(ref_file_name).parent / "out" /  ( pathlib.Path(ref_file_name).stem + "_out.pickle" )
-    pathlib.Path(out_pickle_file_name).parent.mkdir(parents=True, exist_ok=True)
-    SaveToPickleFile( obj, out_pickle_file_name )
-    msg = "pickle saved: %s" % out_pickle_file_name
-    print(msg)
-    logging.info(msg)
 
 """
 -----------------------------------------------
 Find the nearest specific file, usually setting file
 -----------------------------------------------
 """
-
 def FindNearestFile( start_position, file_name ):
-    import os
-    from pathlib import Path
-
     start_position = os.path.abspath(start_position)
-    parents = [ str(x) for x in Path(start_position).parents ]
+    parents = [ str(x) for x in pathlib.Path(start_position).parents ]
 
     # LogInfo("start_position = %s" % start_position)
     for path in parents:
@@ -273,7 +265,7 @@ Main Test
 --------------------------------------------------------
 """
 if __name__ == '__main__':
-    data = [u"中文",u"好棒棒"]
+    data = [u"中文",u"字串測試"]
     print("data=", StrObj(data))
 
     SaveToJsonFile(data, "test.json" )
