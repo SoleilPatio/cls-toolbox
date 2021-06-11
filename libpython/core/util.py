@@ -93,11 +93,16 @@ def StrObj(obj):
     #Python 3
     return json.dumps(obj, indent=4 , sort_keys=True, ensure_ascii=False, default=lambda o: vars(o) ) #ensure_ascii=false for non-ascii character
 
+def _save_to_json_process_(obj):
+    try:
+        return vars(obj)
+    except:
+        return f"<<non-serializable: {type(obj).__qualname__}>>"
 
-def SaveToJsonFile(obj, json_file_name):
+def SaveToJsonFile(obj, json_file_name, sort_keys=True):
     pathlib.Path(json_file_name).parent.mkdir(parents=True, exist_ok=True)
     with codecs.open(json_file_name, 'w' , encoding='utf-8') as outfile:
-        json.dump(obj, outfile, indent=4 , ensure_ascii=False, sort_keys=True, default=lambda o: vars(o)) #Good
+        json.dump(obj, outfile, indent=4 , ensure_ascii=False, sort_keys=sort_keys, default=_save_to_json_process_)
         return
 
 def LoadFromJsonFile(json_file_name):
