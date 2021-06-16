@@ -231,7 +231,7 @@ def WxWidgetDataSync( dic_obj, key, widget , direction='from'):
 
 
 def WxGetWidgetValue(widget):
-    import wx
+    import wx #type: ignore
     if      isinstance(widget, wx.ComboBox):    #https://wxpython.org/Phoenix/docs/html/wx.ComboBox.html?highlight=wx%20combobox#wx.ComboBox
         return widget.GetValue()
         # return widget.GetStringSelection()
@@ -246,7 +246,7 @@ def WxGetWidgetValue(widget):
   
 
 def WxSetWidgetValue(widget, value):
-    import wx
+    import wx #type: ignore
     if      isinstance(widget, wx.ComboBox):    #https://wxpython.org/Phoenix/docs/html/wx.ComboBox.html?highlight=wx%20combobox#wx.ComboBox
         return widget.SetValue(str(value))
     elif    isinstance(widget, wx.SpinCtrl):    #https://wxpython.org/Phoenix/docs/html/wx.SpinCtrl.html?highlight=wx%20spinctrl#wx.SpinCtrl 
