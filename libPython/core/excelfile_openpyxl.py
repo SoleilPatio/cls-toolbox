@@ -120,6 +120,19 @@ class ExcelfileOpenpyxl(object):
         for row in rows:
             self.workbook.active.append(row)
 
+    """
+    -----------------------------------------------
+    Write by COLS
+    -----------------------------------------------
+    """
+    def AppendCols(self, cols ):
+        col_num = len(cols)
+        start_col = self.max_column() + 1
+        ws = self.workbook.active
+
+        for i, ci in enumerate(range(start_col, start_col+col_num)):
+            for j in range(len(cols[i])):
+                ws.cell(row=j+1, column=ci).value = cols[i][j]
 
 
 
@@ -306,6 +319,18 @@ def TEST_3_chart():
 
     excel.Save()
 
+def TEST_4_AppendCol():
+    excel = ExcelfileOpenpyxl()
+    excel.Open("test.xlsx")
+
+    cols = [list(range(5))]*3
+
+    print(f"max_col={excel.max_column()}")
+    excel.AppendCols(cols)
+
+    excel.Save()
+
+
 
 
 
@@ -313,7 +338,8 @@ def TEST_3_chart():
 if __name__ == '__main__':
     # TEST_1_colname()
     # TEST_2_change_active_sheet()
-    TEST_3_chart()
+    # TEST_3_chart()
+    TEST_4_AppendCol()
 
 
     
