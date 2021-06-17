@@ -185,12 +185,13 @@ class ExcelfileOpenpyxl(object):
     Scatter Chart
         StrRefWorkaround:
             1.True : to workaround always set title_from_data=true but actually no
-                1-1: in y_value_reference, "min_col" = "min_col"-1
+                1-1: in y_value_reference, "min_row" = "min_row"-1
+                1-2: only work in vertical arrange data, if horizontal arrange, then "min_col" = "min_col"-1
                 1-2: if title_from_data not set to True, can set title to reference string "=Sheet!$A$1"
 
     -----------------------------------------------
     """
-    def AddScatterChart(self, x_val_desc_obj, y_val_desc_obj, name_cell, sheet_name="CHART_SHEET", StrRefWorkaround=True):
+    def AddScatterChart(self, x_val_desc_obj, y_val_desc_obj, name_cell, sheet_name="CHART_GRAPH", StrRefWorkaround=True):
         chart_obj = self.GetChartObject("scatter", sheet_name)
         series = self.CreateSeries(x_val_desc_obj, y_val_desc_obj, name_cell, StrRefWorkaround=StrRefWorkaround)
         chart_obj.series.append(series)
@@ -209,7 +210,7 @@ class ExcelfileOpenpyxl(object):
         # title_from_data=True workaround
         #...................................
         if StrRefWorkaround:
-            y_val_desc_obj["min_col"] = y_val_desc_obj["min_col"]-1
+            y_val_desc_obj["min_row"] = y_val_desc_obj["min_row"]-1
         yvalues = openpyxl.chart.Reference(ws, **y_val_desc_obj)
         series = openpyxl.chart.Series(yvalues, xvalues, title_from_data=True) # NOTE: title_from_data must be set to True for latter StrRef setting
         series.tx.strRef = openpyxl.chart.data_source.StrRef( name_cell )
@@ -227,10 +228,10 @@ class ExcelfileOpenpyxl(object):
     Bar Chart (category (x_value) can only be column )
         from_rows : 
             1. default is False, let data can only be vertical arranged
-            2. set to True for my convenience
+            2. set to False, horizontal arrange is not good for column count has limit to about 10K while row count is 1000K
     -----------------------------------------------
     """
-    def AddBarChart(self, x_val_desc_obj, y_val_desc_obj, name_cell, sheet_name="CHART_SHEET", from_rows=True):
+    def AddBarChart(self, x_val_desc_obj, y_val_desc_obj, name_cell, sheet_name="CHART_GRAPH", from_rows=False):
         chart_obj = self.GetChartObject("bar", sheet_name)
 
         # Get Categories
@@ -290,15 +291,15 @@ def TEST_3_chart():
     excel = ExcelfileOpenpyxl()
     excel.Open("test.xlsx")
 
-    for i in range(10):
-        x_val_desc_obj = {"sheet":"Sheet", "min_row":1, "min_col":3, "max_col": 7}
-        y_val_desc_obj = {"sheet":"Sheet", "min_row":2, "min_col":3, "max_col": 7}
+    for i in range(1):
+        x_val_desc_obj = {"sheet":"Sheet", "min_col":1, "min_row":3, "max_row": 7}
+        y_val_desc_obj = {"sheet":"Sheet", "min_col":2, "min_row":3, "max_row": 7}
         name_cell = "'sheet'!$A$1"
         excel.AddScatterChart(x_val_desc_obj, y_val_desc_obj, name_cell)
 
 
-        x_val_desc_obj = {"sheet":"Sheet", "min_row":1, "min_col":3, "max_col": 7}
-        y_val_desc_obj = {"sheet":"Sheet", "min_row":2, "min_col":3, "max_col": 7}
+        x_val_desc_obj = {"sheet":"Sheet", "min_col":1, "min_row":3, "max_row": 7}
+        y_val_desc_obj = {"sheet":"Sheet", "min_col":2, "min_row":3, "max_row": 7}
         name_cell = "'sheet'!$A$1"
         excel.AddBarChart(x_val_desc_obj, y_val_desc_obj, name_cell)
 
