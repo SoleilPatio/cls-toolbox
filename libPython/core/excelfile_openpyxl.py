@@ -148,33 +148,41 @@ class ExcelfileOpenpyxl(object):
         "scatter"
     -----------------------------------------------
     """
-    def GetChartObject(self, chart_type, sheet_name):
+    def GetChartObject(self, sheet_name, chart_type, group_name):
         self.chartobj_lookup[sheet_name] = self.chartobj_lookup.get(sheet_name, {})
         self.chartobj_lookup[sheet_name][chart_type] = self.chartobj_lookup[sheet_name].get(chart_type, {})
-        chart_info = self.chartobj_lookup[sheet_name][chart_type]
+        self.chartobj_lookup[sheet_name][chart_type][group_name] = self.chartobj_lookup[sheet_name][chart_type].get(group_name, {})
+        chart_info = self.chartobj_lookup[sheet_name][chart_type][group_name]
 
         if chart_info:
             return chart_info["chart_obj"] #return chart object
 
+        #Calculate chart count
+        chart_sum = 0
+        for type in self.chartobj_lookup[sheet_name]:
+            chart_sum += len(self.chartobj_lookup[sheet_name][type])
+
         #Create a new chart object
         if chart_type == "scatter":
             chart_info["chart_obj"] = openpyxl.chart.ScatterChart()
-            chart_info["id"] = len(self.chartobj_lookup[sheet_name]) - 1
-            util.LogInfo(f"Create chart object:{chart_type}")
+            
         elif chart_type == "bar":
             chart_info["chart_obj"] = openpyxl.chart.BarChart()
-            chart_info["id"] = len(self.chartobj_lookup[sheet_name]) - 1
-            util.LogInfo(f"Create chart object:{chart_type}")
         else:
             util.LogError(f"Unsupport chart type: {chart_type}")
             return None
 
+        
+        chart_info["chart_obj"].title = f"{chart_type}_{group_name}"
+        chart_info["id"] = chart_sum - 1
         chart_obj = chart_info["chart_obj"]
 
         #initial position
         width = 10
         height = 18
-        chart_pos = f"{self.col_name(chart_info['id'] * width + 1)}{ int(chart_info['id']/4)*height + 1 }"
+        chart_pos = f"{self.col_name( (chart_info['id']%4) * width + 1)}{ int(chart_info['id']/4)*height + 1 }"
+
+        util.LogInfo(f'Create chart object: title={chart_type}_{group_name} id={chart_info["id"]} pos={chart_pos}')
 
         #Get sheet
         sheet_obj = self.GetSheetByName(sheet_name)
@@ -204,8 +212,8 @@ class ExcelfileOpenpyxl(object):
 
     -----------------------------------------------
     """
-    def AddScatterChart(self, x_val_desc_obj, y_val_desc_obj, name_cell, sheet_name="CHART_GRAPH", StrRefWorkaround=True):
-        chart_obj = self.GetChartObject("scatter", sheet_name)
+    def AddScatterChart(self, x_val_desc_obj, y_val_desc_obj, name_cell, sheet_name="CHART_GRAPH", group_name="", StrRefWorkaround=True):
+        chart_obj = self.GetChartObject(sheet_name, "scatter", group_name)
         series = self.CreateSeries(x_val_desc_obj, y_val_desc_obj, name_cell, StrRefWorkaround=StrRefWorkaround)
         chart_obj.series.append(series)
 
@@ -244,8 +252,8 @@ class ExcelfileOpenpyxl(object):
             2. set to False, horizontal arrange is not good for column count has limit to about 10K while row count is 1000K
     -----------------------------------------------
     """
-    def AddBarChart(self, x_val_desc_obj, y_val_desc_obj, name_cell, sheet_name="CHART_GRAPH", from_rows=False):
-        chart_obj = self.GetChartObject("bar", sheet_name)
+    def AddBarChart(self, x_val_desc_obj, y_val_desc_obj, name_cell, sheet_name="CHART_GRAPH", group_name="", from_rows=False):
+        chart_obj = self.GetChartObject(sheet_name, "bar", group_name)
 
         # Get Categories
         ws = self.GetSheetByName(x_val_desc_obj["sheet"])
@@ -304,17 +312,17 @@ def TEST_3_chart():
     excel = ExcelfileOpenpyxl()
     excel.Open("test.xlsx")
 
-    for i in range(1):
+    for i in range(3):
         x_val_desc_obj = {"sheet":"Sheet", "min_col":1, "min_row":3, "max_row": 7}
         y_val_desc_obj = {"sheet":"Sheet", "min_col":2, "min_row":3, "max_row": 7}
         name_cell = "'sheet'!$A$1"
-        excel.AddScatterChart(x_val_desc_obj, y_val_desc_obj, name_cell)
+        excel.AddScatterChart(x_val_desc_obj, y_val_desc_obj, name_cell, group_name=str(i))
 
 
         x_val_desc_obj = {"sheet":"Sheet", "min_col":1, "min_row":3, "max_row": 7}
         y_val_desc_obj = {"sheet":"Sheet", "min_col":2, "min_row":3, "max_row": 7}
         name_cell = "'sheet'!$A$1"
-        excel.AddBarChart(x_val_desc_obj, y_val_desc_obj, name_cell)
+        excel.AddBarChart(x_val_desc_obj, y_val_desc_obj, name_cell, group_name=str(i))
 
 
     excel.Save()
@@ -338,8 +346,8 @@ def TEST_4_AppendCol():
 if __name__ == '__main__':
     # TEST_1_colname()
     # TEST_2_change_active_sheet()
-    # TEST_3_chart()
-    TEST_4_AppendCol()
+    TEST_3_chart()
+    # TEST_4_AppendCol()
 
 
     

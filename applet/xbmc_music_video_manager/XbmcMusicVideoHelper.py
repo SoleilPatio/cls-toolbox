@@ -96,9 +96,7 @@ if __name__ == "__main__":
     parser.add_argument("dir", help="music video directories")
     parser.add_argument("-r",  action="store_true", help="recursive process")
     
-    # args = parser.parse_args([r"\\MNEMOSYNE\\NDK-Data\\DB_AV_多媒體資料\\VIDEO_影片\\[MUSIC VIDEOS]\\周慧敏 - あなたへのラヴ・ソング（你的最愛．周慧敏） (LD) 1995.02.25 - 複製"])
     # args = parser.parse_args([r"\\MNEMOSYNE\\NDK-Data\DB_AV_多媒體資料\\VIDEO_影片\\[MUSIC VIDEOS]"])
-    # args = parser.parse_args([r"C:\\APN\\USERS\\clouds\\LocalPicture\\Screen Capture\\SC-LOCAL\\周慧敏 - 一萬天荒愛未老演唱會 (2018)"])
     args = parser.parse_args() #[NOTE]: Normal Mode
 
     print("args = ", args)
