@@ -279,7 +279,7 @@ class ExcelfileOpenpyxl(object):
         yvalues = openpyxl.chart.Reference(ws, **y_val_desc_obj)
 
         # Add to BarChart
-        chart_obj.add_data(yvalues, titles_from_data=False, from_rows=from_rows)
+        chart_obj.add_data(yvalues, titles_from_data=y_include_title, from_rows=from_rows)
         chart_obj.set_categories(xvalues)
         
 
