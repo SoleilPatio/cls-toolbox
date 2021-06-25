@@ -250,9 +250,12 @@ class ExcelfileOpenpyxl(object):
         from_rows : 
             1. default is False, let data can only be vertical arranged
             2. set to False, horizontal arrange is not good for column count has limit to about 10K while row count is 1000K
+        y_include_title:
+            1. if include title, auto adjust range(one col/row) to cover title cell
+            2. this keep input always define data range
     -----------------------------------------------
     """
-    def AddBarChart(self, x_val_desc_obj, y_val_desc_obj, name_cell, sheet_name="CHART_GRAPH", group_name="", from_rows=False):
+    def AddBarChart(self, x_val_desc_obj, y_val_desc_obj, name_cell, sheet_name="CHART_GRAPH", group_name="", from_rows=False, y_include_title=True):
         chart_obj = self.GetChartObject(sheet_name, "bar", group_name)
 
         # Get Categories
@@ -265,6 +268,14 @@ class ExcelfileOpenpyxl(object):
         ws = self.GetSheetByName(y_val_desc_obj["sheet"])
         y_val_desc_obj = dict(y_val_desc_obj)
         del y_val_desc_obj["sheet"]
+
+        # if include_title , auto adjust range(one col/row) to cover title cell
+        if y_include_title:
+            if from_rows:
+                y_val_desc_obj["min_col"] = y_val_desc_obj["min_col"]-1
+            else:
+                y_val_desc_obj["min_row"] = y_val_desc_obj["min_row"]-1
+
         yvalues = openpyxl.chart.Reference(ws, **y_val_desc_obj)
 
         # Add to BarChart
