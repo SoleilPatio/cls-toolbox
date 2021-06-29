@@ -114,7 +114,7 @@ ListFindRangeIdx:
     input_list[lo_i:up_i] is what you want
 -----------------------------------------------
 """
-def ListFindRangeIdx( input_list, min_value, max_value):
+def ListFindRangeIdx( input_list, min_value = float('-inf'), max_value = float('inf')):
     lo_i=bisect.bisect_left(input_list, min_value)
     up_i=bisect.bisect_right(input_list, max_value, lo=lo_i)
     return (lo_i, up_i)
@@ -285,11 +285,7 @@ Main Test
 --------------------------------------------------------
 """
 if __name__ == '__main__':
-    data = [u"中文",u"字串測試"]
-    print("data=", StrObj(data))
+    L = list(range(100))
+    m,M = ListFindRangeIdx(L,5)
 
-    SaveToJsonFile(data, "test.json" )
-
-    data2 = LoadFromJsonFile("test.json")
-    print("data2=", StrObj(data2))
-
+    print(L[m:M])
