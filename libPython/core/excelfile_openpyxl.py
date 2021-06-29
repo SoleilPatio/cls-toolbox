@@ -144,8 +144,19 @@ class ExcelfileOpenpyxl(object):
     """
     -----------------------------------------------
     Return openpyxl chart object of a designated sheet
-    chart_type:
-        "scatter"
+    Hiarch:
+        {
+            sheet_name:{
+                chart_type:{
+                    group_name:{
+                        chart_obj: <openpyxl obj>
+                    }
+                }
+            }
+        }
+    Naming:
+        chart_type: "scatter", "bar"
+        chart title: {chart_type}:{group_name}
     -----------------------------------------------
     """
     def GetChartObject(self, sheet_name, chart_type, group_name):
@@ -172,8 +183,10 @@ class ExcelfileOpenpyxl(object):
             util.LogError(f"Unsupport chart type: {chart_type}")
             return None
 
-        
-        chart_info["chart_obj"].title = f"{chart_type}_{group_name}"
+        if group_name:
+            chart_info["chart_obj"].title = f"{chart_type}:{group_name}"
+        else:
+            chart_info["chart_obj"].title = f"{chart_type}"
         chart_info["id"] = chart_sum - 1
         chart_obj = chart_info["chart_obj"]
 
