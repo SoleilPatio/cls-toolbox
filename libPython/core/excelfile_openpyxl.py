@@ -195,7 +195,7 @@ class ExcelfileOpenpyxl(object):
         height = 18
         chart_pos = f"{self.col_name( (chart_info['id']%4) * width + 1)}{ int(chart_info['id']/4)*height + 1 }"
 
-        util.LogInfo(f'Create chart object: title={chart_type}_{group_name} id={chart_info["id"]} pos={chart_pos}')
+        util.LogInfo(f'Create chart object: title={chart_info["chart_obj"].title} id={chart_info["id"]} pos={chart_pos}')
 
         #Get sheet
         sheet_obj = self.GetSheetByName(sheet_name)
