@@ -184,9 +184,10 @@ class ExcelfileOpenpyxl(object):
             return None
 
         if group_name:
-            chart_info["chart_obj"].title = f"{chart_type}:{group_name}"
+            title = f"{chart_type}:{group_name}"
         else:
-            chart_info["chart_obj"].title = f"{chart_type}"
+            title = f"{chart_type}"
+        chart_info["chart_obj"].title = title
         chart_info["id"] = chart_sum - 1
         chart_obj = chart_info["chart_obj"]
 
@@ -195,7 +196,7 @@ class ExcelfileOpenpyxl(object):
         height = 18
         chart_pos = f"{self.col_name( (chart_info['id']%4) * width + 1)}{ int(chart_info['id']/4)*height + 1 }"
 
-        util.LogInfo(f'Create chart object: title={chart_info["chart_obj"].title} id={chart_info["id"]} pos={chart_pos}')
+        util.LogInfo(f'Create chart object: title={title} id={chart_info["id"]} pos={chart_pos}')
 
         #Get sheet
         sheet_obj = self.GetSheetByName(sheet_name)
