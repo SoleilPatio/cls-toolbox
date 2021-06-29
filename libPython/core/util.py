@@ -12,6 +12,7 @@ import subprocess
 import traceback
 import errno
 import importlib
+import bisect
 
 
 """
@@ -101,6 +102,25 @@ def LoadFromPickleFile(pickle_file_name):
     with open(pickle_file_name, 'rb') as infile:
         pickle_loaded = pickle.load(infile)
         return pickle_loaded
+
+"""
+--------------------------------------------------------
+List/Array Utilities
+--------------------------------------------------------
+"""
+"""
+-----------------------------------------------
+ListFindRangeIdx:
+    input_list[lo_i:up_i] is what you want
+-----------------------------------------------
+"""
+def ListFindRangeIdx( input_list, min_value, max_value):
+    lo_i=bisect.bisect_left(input_list, min_value)
+    up_i=bisect.bisect_right(input_list, max_value, lo=lo_i)
+    return (lo_i, up_i)
+
+
+
 
     
 """
