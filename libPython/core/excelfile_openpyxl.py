@@ -134,6 +134,13 @@ class ExcelfileOpenpyxl(object):
             for j in range(len(cols[i])):
                 ws.cell(row=j+1, column=ci).value = cols[i][j]
 
+    """
+    -----------------------------------------------
+    Other Operations
+    -----------------------------------------------
+    """
+    def MergeCells(self, range_string=None, start_row=None, start_column=None, end_row=None, end_column=None):
+        return self.workbook.active.merge_cells(range_string=range_string, start_row=start_row, start_column=start_column, end_row=end_row, end_column=end_column)
 
 
     """
