@@ -20,7 +20,7 @@ import bisect
 Exception
 -----------------------------------------------
 """
-def ExceptionStr(self):
+def ExceptionStr():
         return traceback.format_exc() 
 
 """
@@ -77,8 +77,8 @@ def _save_to_json_process_(obj):
     except:
         return f"<<non-serializable: {type(obj).__qualname__}>>"
 
-def StrObj(obj):
-    return json.dumps(obj, indent=4 , sort_keys=True, ensure_ascii=False, default=_save_to_json_process_ ) #ensure_ascii=false for non-ascii character
+def StrObj(obj, sort_keys=True):
+    return json.dumps(obj, indent=4 , ensure_ascii=False, sort_keys=sort_keys,  default=_save_to_json_process_ ) #ensure_ascii=false for non-ascii character
 
 
 def SaveToJsonFile(obj, json_file_name, sort_keys=True):
