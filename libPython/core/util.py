@@ -128,22 +128,22 @@ def ListFindRangeIdx( input_list, min_value = float('-inf'), max_value = float('
 Save Proper Utilities
 --------------------------------------------------------
 """
-def SaveToProperJson(obj, ref_file_name):
-    out_json_file_name = pathlib.Path(ref_file_name).parent / "out" /  ( pathlib.Path(ref_file_name).stem + "_out.json" )
+def SaveToProperJson(obj, ref_file_name, tag=""):
+    out_json_file_name = pathlib.Path(ref_file_name).parent / "out" /  ( pathlib.Path(ref_file_name).stem + tag + "_out.json" )
     pathlib.Path(out_json_file_name).parent.mkdir(parents=True, exist_ok=True)
     SaveToJsonFile( obj, out_json_file_name )
     msg = "json saved: %s" % out_json_file_name
     LogInfo(msg)
 
-def SaveToProperPickle(obj, ref_file_name):
-    out_pickle_file_name = pathlib.Path(ref_file_name).parent / "out" /  ( pathlib.Path(ref_file_name).stem + "_out.pickle" )
+def SaveToProperPickle(obj, ref_file_name, tag=""):
+    out_pickle_file_name = pathlib.Path(ref_file_name).parent / "out" /  ( pathlib.Path(ref_file_name).stem + tag + "_out.pickle" )
     pathlib.Path(out_pickle_file_name).parent.mkdir(parents=True, exist_ok=True)
     SaveToPickleFile( obj, out_pickle_file_name )
     msg = "pickle saved: %s" % out_pickle_file_name
     LogInfo(msg)
 
-def SaveToProperPltfig(plt, ref_file_name):
-    out_jpg_file_name = pathlib.Path(ref_file_name).parent / "out" /  ( pathlib.Path(ref_file_name).stem + "_out.jpg" )
+def SaveToProperPltfig(plt, ref_file_name, tag=""):
+    out_jpg_file_name = pathlib.Path(ref_file_name).parent / "out" /  ( pathlib.Path(ref_file_name).stem + tag + "_out.jpg" )
     pathlib.Path(out_jpg_file_name).parent.mkdir(parents=True, exist_ok=True)
     plt.savefig( out_jpg_file_name)
     msg = "jpg saved: %s" % out_jpg_file_name
