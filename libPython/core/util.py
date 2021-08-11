@@ -9,6 +9,7 @@ import pathlib
 import commentjson  as json #commentjson cannot be pyinstaller
 import codecs
 import subprocess
+import shlex
 import traceback
 import errno
 import importlib
@@ -194,6 +195,19 @@ def RunCommand( command_line, input_str = None, text_mode = True ):
 
 """
 -----------------------------------------------
+Execute Command Utilities Synchronize
+
+-----------------------------------------------
+"""
+def RunCommandSync( command_line):
+    #........................................................
+    # Execute command line
+    #........................................................
+    return subprocess.run(shlex.split(command_line))
+
+
+"""
+-----------------------------------------------
 Load Python Module
 -----------------------------------------------
 """
@@ -285,7 +299,8 @@ Main Test
 --------------------------------------------------------
 """
 if __name__ == '__main__':
-    L = list(range(100))
-    m,M = ListFindRangeIdx(L,5)
-
-    print(L[m:M])
+    cmd = "dir -lsr"
+    # result, stdout, stderror = RunCommand(cmd)
+    # subprocess.run(["dir"])
+    RunCommandSync(cmd)
+    # print(stdout)
