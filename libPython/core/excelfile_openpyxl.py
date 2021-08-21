@@ -233,13 +233,15 @@ class ExcelfileOpenpyxl(object):
 
     -----------------------------------------------
     """
-    def AddScatterChart(self, x_val_desc_obj, y_val_desc_obj, name_cell, sheet_name="CHART_GRAPH", group_name="", StrRefWorkaround=True):
+    def AddScatterChart(self, x_val_desc_obj, y_val_desc_obj, name_cell, sheet_name="CHART_GRAPH", group_name="", StrRefWorkaround=True, marker = False, lineNoFill = False):
         chart_obj = self.GetChartObject(sheet_name, "scatter", group_name)
-        series = self.CreateSeries(x_val_desc_obj, y_val_desc_obj, name_cell, StrRefWorkaround=StrRefWorkaround)
+        series = self.CreateSeries(x_val_desc_obj, y_val_desc_obj, name_cell, StrRefWorkaround=StrRefWorkaround, marker=marker, lineNoFill=lineNoFill)
+
+        #add series
         chart_obj.series.append(series)
 
 
-    def CreateSeries(self, x_val_desc_obj, y_val_desc_obj, name_cell, StrRefWorkaround=True):
+    def CreateSeries(self, x_val_desc_obj, y_val_desc_obj, name_cell, StrRefWorkaround=True, marker = False, lineNoFill = False):
         ws = self.GetSheetByName(x_val_desc_obj["sheet"])
         x_val_desc_obj = dict(x_val_desc_obj)
         del x_val_desc_obj["sheet"]
@@ -256,6 +258,16 @@ class ExcelfileOpenpyxl(object):
         yvalues = openpyxl.chart.Reference(ws, **y_val_desc_obj)
         series = openpyxl.chart.Series(yvalues, xvalues, title_from_data=True) # NOTE: title_from_data must be set to True for latter StrRef setting
         series.tx.strRef = openpyxl.chart.data_source.StrRef( name_cell )
+
+        #...................................
+        # symbol set: openpyxl.chart.marker.Marker.symbol.values
+        #                   = {'triangle', 'circle', None, 'diamond', 'plus', 'star', 'auto', 'dot', 'picture', 'dash', 'square', 'x'}
+        #...................................
+        if type(marker) is str:
+            series.marker=openpyxl.chart.marker.Marker(marker)
+        elif marker is True:
+            series.marker=openpyxl.chart.marker.Marker('auto')
+        series.graphicalProperties.line.noFill = lineNoFill
 
         return series
 
@@ -348,7 +360,7 @@ def TEST_3_chart():
         x_val_desc_obj = {"sheet":"Sheet", "min_col":1, "min_row":3, "max_row": 7}
         y_val_desc_obj = {"sheet":"Sheet", "min_col":2, "min_row":3, "max_row": 7}
         name_cell = "'sheet'!$A$1"
-        excel.AddScatterChart(x_val_desc_obj, y_val_desc_obj, name_cell, group_name=str(i))
+        excel.AddScatterChart(x_val_desc_obj, y_val_desc_obj, name_cell, group_name=str(i), marker="x", lineNoFill=True)
 
 
         x_val_desc_obj = {"sheet":"Sheet", "min_col":1, "min_row":3, "max_row": 7}
