@@ -269,6 +269,9 @@ class ExcelfileOpenpyxl(object):
             series.marker=openpyxl.chart.marker.Marker('auto')
         series.graphicalProperties.line.noFill = lineNoFill
 
+        #test
+        # series.marker.graphicalProperties.solidFill = MyColorChoice(srgbClr=MyRGBColor('0000FF', alpha=50000))
+
         return series
 
     """
@@ -317,6 +320,33 @@ class ExcelfileOpenpyxl(object):
         
 
 
+"""
+-----------------------------------------------
+Trick to set alpa color
+Ex:
+    series.marker.graphicalProperties.solidFill = MyColorChoice(srgbClr=MyRGBColor('0000FF', alpha=50000))
+    alpha (transparent) 0~100000 (opaque)
+-----------------------------------------------
+"""    
+from openpyxl.descriptors import Typed
+from openpyxl.descriptors.serialisable import Serialisable
+from openpyxl.descriptors.nested import NestedInteger
+from openpyxl.xml.constants import DRAWING_NS
+from openpyxl.drawing.colors import ColorChoice, ColorChoiceDescriptor
+
+class MyRGBColor(Serialisable):
+    tagname = 'srgbClr'
+    namespace = DRAWING_NS
+    val = Typed(expected_type=str)
+    alpha = NestedInteger(allow_none=True)
+    __elements__ = ('alpha', )
+
+    def __init__(self, val, alpha=None):
+        self.val = val
+        self.alpha = alpha
+
+class MyColorChoice(ColorChoice):
+    srgbClr = Typed(expected_type=MyRGBColor, allow_none=True)
         
 """
 -----------------------------------------------
