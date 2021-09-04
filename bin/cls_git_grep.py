@@ -4,49 +4,37 @@ from __future__ import print_function
 if __name__ == '__main__': import _libpythonpath_ #type: ignore (Add libPython\.. into PYTHONPATH when unittest )
 
 
-import argparse
-import os
 import sys
-import platform
+import re
 import libPython.core.util as util
 from fullpath import Fullpath
 
 
 
-
 if __name__ == "__main__":
-    print(sys.argv)
     cmd = " ".join(sys.argv[1:])
-    print(cmd)
-    cmd = "git grep " + cmd
-    print(cmd)
+    cmd = "git grep -n " + cmd
+    print("command: ", cmd)
+    print("")
+
     result, stdout, stderr = util.RunCommand(cmd, text_mode = False)
     # result, stdout, stderr = util.RunCommand(cmd, text_mode = True)
-    print(result)
-    print(stdout)
+    if result != 0:
+        stderr = stderr.decode("utf-8")
+        util.LogError(f"\n\nresult={result}\n\nstderr={stderr}")
+        exit(-1)
 
     stdout = stdout.decode("utf-8") 
     lines = stdout.splitlines()
     for line in lines:
+        """
+        algorithm/cracking_the_coding_interview_5/python/Phase1/bit_manipulation.py-52-
+        algorithm/cracking_the_coding_interview_5/python/Phase1/bit_manipulation.py:53:def main_float_to_bin():
+        algorithm/cracking_the_coding_interview_5/python/Phase1/bit_manipulation.py-54-    print float_to_bin(0.5)
+        """
+        m = re.match( r"(.*)([:-]\d+[:-].*)", line, re.M)
+        if m:
+            fullpath = Fullpath(m.group(1))
+            line = fullpath + m.group(2)
         print(line)
-
-
-    print(stderr)
-
-
-
-
-
-
-    # parser  = argparse.ArgumentParser(description='Display the full path name of a file.')
-    # parser.add_argument('filename', type=str, nargs='*', default=[f for f in os.listdir(os.getcwd())],
-    #                     help="One or more filenames or directory names. Defaults to all files in the current working directory, like 'ls -a'.")
-    # parser.add_argument('-f', '--files-only', help="List only files, not directories", default=False, action='store_true')
-    # args = parser.parse_args()
-
-    # for f in args.filename:
-    #     full_path = Fullpath(f)
-    #     # Print if it's a file, or it's a directory and "--all" is True
-    #     if (os.path.isfile(full_path)) or (os.path.isdir(full_path) and not args.files_only):
-    #         print(full_path)
 
