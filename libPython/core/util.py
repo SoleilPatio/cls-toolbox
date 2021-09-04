@@ -5,8 +5,10 @@ import sys
 import logging
 import pickle
 import pathlib
-# import json
-import commentjson  as json #commentjson cannot be pyinstaller
+try:
+    import commentjson  as json #commentjson cannot be pyinstaller
+except:
+    import json
 import codecs
 import subprocess
 import shlex
