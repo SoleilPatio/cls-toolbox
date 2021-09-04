@@ -6,9 +6,7 @@ if __name__ == '__main__': import _libpythonpath_ #type: ignore (Add libPython\.
 
 import argparse
 import os
-import sys
 import platform
-import subprocess
 import libPython.core.util as util
 
 def Fullpath( filename ):
