@@ -15,6 +15,9 @@ tempCodeRunnerFile*
 build/
 dist/
 
+#output directory
+out-*/
+
 #app
 applet/invest_sim/data
 applet/invest_sim/cache

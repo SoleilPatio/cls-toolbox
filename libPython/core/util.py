@@ -29,28 +29,30 @@ def ExceptionStr():
 """
 -----------------------------------------------
 Log Utilities
+    base_path:
+        file: create out at the same level
+        dir : create out under it
 -----------------------------------------------
 """
-def LogInitial(main_file_path, level=logging.DEBUG):
+def LogInitial(base_path, level=logging.DEBUG, prog_name=""):
     #...................................
     #prepare Output directory
     #...................................
-    # OUT_DIR = os.path.join( os.getcwd(), "out" )
-    OUT_DIR = os.path.join( os.path.dirname(os.path.abspath(main_file_path)) , "out" )
+    rootdir = base_path if os.path.isdir(base_path) else os.path.dirname(base_path)
+    OUT_DIR = os.path.join( rootdir, "out-" + prog_name  if prog_name else "out" )
     if not os.path.exists(OUT_DIR):
         CreateDir(OUT_DIR)
     #...................................
     #logger 
     #...................................
-    exe_log_filename = os.path.join(OUT_DIR, 'execution.log' )
+    exe_log_filename = os.path.join(OUT_DIR, f'log-execution-{prog_name}.log' if prog_name else 'log-execution.log' )
     logging.basicConfig(filename=exe_log_filename, filemode='w', 
         level=logging.DEBUG
         # level=logging.INFO
         )
-    
-    LogInfo("OUT_DIR= %s" % OUT_DIR)
-    LogInfo("exe_log_filename= %s" % exe_log_filename)
-    return OUT_DIR
+    LogInfo("OUT_DIR= %s" % OUT_DIR, stdout=False)
+    LogInfo("exe_log_filename= %s" % exe_log_filename, stdout=False)
+    return OUT_DIR, exe_log_filename
 
 def Log( msg, stdout = True ):
     print(msg) if stdout else None
