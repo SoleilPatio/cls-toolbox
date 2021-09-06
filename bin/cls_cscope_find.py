@@ -29,7 +29,7 @@ def CurrentDirectory():
     return stdout.strip()
 
 
-def FindFiles( dirpath,  FILE_TYPES, EXCLUDE_DIRS, INCLUDE_DIRS, b_abspath = False):
+def FindFiles( dirpath,  FILE_TYPES, EXCLUDE_DIR_PATTERN, INCLUDE_DIR_PATTERN, b_abspath = False):
     cwd = CurrentDirectory()
     # print("cwd=",cwd)
     isabs = os.path.isabs(dirpath)
@@ -47,9 +47,12 @@ def FindFiles( dirpath,  FILE_TYPES, EXCLUDE_DIRS, INCLUDE_DIRS, b_abspath = Fal
     ('/python/demo/root/2subDir', ['22subDir'], ['23file', '21file'])
     ('/python/demo/root/2subDir/22subDir', [], ['221file'])
     """
-    count = 0
+    dir_exclude_count = 0
+    file_count = 0
+    file_type_count = { file_type:0 for file_type in FILE_TYPES }
     for root, dirnames, filenames in os.walk(dirpath):
-        if check_if_dir_include( root, EXCLUDE_DIRS, INCLUDE_DIRS) is False:
+        if check_if_dir_include( root, EXCLUDE_DIR_PATTERN, INCLUDE_DIR_PATTERN) is False:
+            dir_exclude_count +=1
             continue
 
         for file_type in FILE_TYPES:
@@ -59,17 +62,22 @@ def FindFiles( dirpath,  FILE_TYPES, EXCLUDE_DIRS, INCLUDE_DIRS, b_abspath = Fal
                 else:
                     full_path = os.path.join(root, filename)
                 print(full_path)
-                count += 1
+                file_count += 1
+                file_type_count[file_type] += 1
 
-    # print("count=", count)
+    util.LogInfo(f"\tfile_count={file_count}", stdout=False)
+    util.LogInfo(f"\tdir_exclude_count={dir_exclude_count}", stdout=False)
+    for file_type in FILE_TYPES:
+        if file_type_count[file_type]:
+            util.LogInfo(f"\t\tfile_type[{file_type}]={file_type_count[file_type]}", stdout=False)
 
 
-def check_if_dir_include( path, EXCLUDE_DIRS, INCLUDE_DIRS):
-    for in_dir_pattern in INCLUDE_DIRS:
+def check_if_dir_include( path, EXCLUDE_DIR_PATTERN, INCLUDE_DIR_PATTERN):
+    for in_dir_pattern in INCLUDE_DIR_PATTERN:
         m = re.match(f".*({in_dir_pattern}).*", path, re.M )
         if m:
             return True
-    for ex_dir_pattern in EXCLUDE_DIRS:
+    for ex_dir_pattern in EXCLUDE_DIR_PATTERN:
         m = re.match(f".*({ex_dir_pattern}).*", path, re.M )
         if m:
             return False
