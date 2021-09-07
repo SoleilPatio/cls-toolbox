@@ -114,9 +114,9 @@ if __name__ == "__main__":
     #...................................
     # Load default config file, if not exist create a default one
     #...................................
-    try:
+    if os.path.isfile(args.config_file):
         config = util.LoadFromJsonFile(args.config_file)
-    except:
+    else:
         util.LogInfo(f"create a default cls_cscope_find.conf.", stdout=False )
         config = {
             "FILE_TYPES": [
