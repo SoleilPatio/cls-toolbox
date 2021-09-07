@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "Create cscope.files ..."
-time cls_cscope_find.py -a    > .vscode/cscope/cscope.files
+time cls_cscope_find.py -aq    > .vscode/cscope/cscope.files
 echo "Total files listed: "`wc -l .vscode/cscope/cscope.files` 
 echo "Create ctags.files ..."
 time cls_cscope_find.py       > ctags.files

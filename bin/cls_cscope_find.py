@@ -29,7 +29,7 @@ def CurrentDirectory():
     return stdout.strip()
 
 
-def FindFiles( dirpath,  FILE_TYPES, EXCLUDE_DIR_PATTERN, INCLUDE_DIR_PATTERN, b_abspath = False):
+def FindFiles( dirpath,  FILE_TYPES, EXCLUDE_DIR_PATTERN, INCLUDE_DIR_PATTERN, b_abspath = False, b_quote = False):
     cwd = CurrentDirectory()
     # print("cwd=",cwd)
     isabs = os.path.isabs(dirpath)
@@ -61,6 +61,8 @@ def FindFiles( dirpath,  FILE_TYPES, EXCLUDE_DIR_PATTERN, INCLUDE_DIR_PATTERN, b
                     full_path = os.path.join(cwd, root, filename)
                 else:
                     full_path = os.path.join(root, filename)
+                if b_quote:
+                    full_path = f'"{full_path}"'
                 print(full_path)
                 file_count += 1
                 file_type_count[file_type] += 1
@@ -96,12 +98,42 @@ if __name__ == "__main__":
     parser.add_argument('config_file', type=str, nargs='?', default="cls_cscope_find.conf",
                         help="default use 'cls_cscope_find.conf' in currrent working directory.")
     parser.add_argument('-a', '--abspath', help="output full absolute path instead of relative one", default=False, action='store_true')
+    parser.add_argument('-q', '--quotation', help="quote output path", default=False, action='store_true')
     args = parser.parse_args()
 
     util.LogInfo(f"args.abspath={args.abspath}", stdout=False )
+    util.LogInfo(f"args.quotation={args.quotation}", stdout=False )
 
 
-    config = util.LoadFromJsonFile(args.config_file)
+
+    #...................................
+    # Load default config file, if not exist create a default one
+    #...................................
+    try:
+        config = util.LoadFromJsonFile(args.config_file)
+    except:
+        util.LogInfo(f"create a default cls_cscope_find.conf.", stdout=False )
+        config = {
+            "FILE_TYPES": [
+                "*.[chxsS]",    "*.aidl",   "*.java",   "*.py",
+                "*.cc",         "*.cpp",    "*.cxx",	"*.hpp",    "*.rc",
+                "*.dts",	    "*.dtsi",
+                "*_defconfig",	"*.mk",	    "*.aidl",	 "*.txt",
+                "kconfig",	    "makefile", "README"
+            ],
+            "PROJECTS": {
+                ".": {
+                    "EXCLUDE_DIR_PATTERN": [],
+                    "INCLUDE_DIR_PATTERN": []
+                }
+            }
+        }
+        util.SaveToJsonFile(config, "cls_cscope_find.conf", sort_keys=False)
+
+
+    #...................................
+    # Main Process
+    #...................................
     FILE_TYPES =    config.get("FILE_TYPES", ["*.*"])  # default *.*
     PROJECTS =      config.get("PROJECTS", {".":{}} )    # default current directory
 
@@ -115,7 +147,7 @@ if __name__ == "__main__":
         util.LogInfo(f"\tINCLUDE_DIR_PATTERN={INCLUDE_DIR_PATTERN}", stdout=False)
 
 
-        FindFiles(project_dir, FILE_TYPES, EXCLUDE_DIR_PATTERN, INCLUDE_DIR_PATTERN, args.abspath)
+        FindFiles(project_dir, FILE_TYPES, EXCLUDE_DIR_PATTERN, INCLUDE_DIR_PATTERN, args.abspath, args.quotation)
 
 
 
