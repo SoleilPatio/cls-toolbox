@@ -61,6 +61,11 @@ def FindFiles( dirpath,  FILE_TYPES, EXCLUDE_DIR_PATTERN, INCLUDE_DIR_PATTERN, b
                     full_path = os.path.join(cwd, root, filename)
                 else:
                     full_path = os.path.join(root, filename)
+
+                #fix: windows url \\ ==> \\\\ or cscope will error
+                if full_path.startswith(r"\\"):
+                    full_path = r"\\" + full_path
+                
                 if b_quote:
                     full_path = f'"{full_path}"'
                 print(full_path)
