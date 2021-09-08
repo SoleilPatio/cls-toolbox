@@ -17,14 +17,11 @@ if __name__ == "__main__":
     print("command: ", cmd)
     print("")
 
-    result, stdout, stderr = util.RunCommand(cmd, text_mode = False)
-    # result, stdout, stderr = util.RunCommand(cmd, text_mode = True)
+    result, stdout, stderr = util.RunCommand(cmd)
     if result != 0:
-        stderr = stderr.decode("utf-8")
         util.LogError(f"\n\nresult={result}\n\nstderr={stderr}")
         exit(-1)
 
-    stdout = stdout.decode("utf-8") 
     lines = stdout.splitlines()
     for line in lines:
         """

@@ -179,9 +179,14 @@ def CreateDefaultOutDir( self, out_dir="out"):
 Execute Command Utilities
     text_mode : True  => text mode , under linux
                 False => UTF-8 mode, under windows
+
+    [?] if you force text mode, sometimes app output characters that cannot be processed, get index error : "stdout = stdout[0] IndexError: list index out of range"
+
+    if <class 'str'> just return
+    if <class 'bytes'> try decode utf-8 , then cp950
 -----------------------------------------------
 """
-def RunCommand( command_line, input_str = None, text_mode = True ):
+def RunCommand( command_line, input_str = None, text_mode = False ):
     #........................................................
     # Execute command line
     #........................................................
@@ -193,9 +198,17 @@ def RunCommand( command_line, input_str = None, text_mode = True ):
     else:
         output = subprocess.Popen( cmd_str, shell = True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=text_mode) #[NOTE]: text=True, text mode
         std_out, std_err = output.communicate()
-    
+
     ret_code = output.returncode
-    return (ret_code, std_out, std_err)
+
+    if text_mode:
+        return (ret_code, std_out, std_err)
+    else:
+        try:
+            return (ret_code, std_out.decode("utf-8"), std_err.decode("utf-8"))
+        except:
+            return (ret_code, std_out.decode("cp950"), std_err.decode("cp950"))
+
 
 """
 -----------------------------------------------
