@@ -207,7 +207,10 @@ def RunCommand( command_line, input_str = None, text_mode = False ):
         try:
             return (ret_code, std_out.decode("utf-8"), std_err.decode("utf-8"))
         except:
-            return (ret_code, std_out.decode("cp950"), std_err.decode("cp950"))
+            try:
+                return (ret_code, std_out.decode("big5"), std_err.decode("big5"))
+            except:
+                return (ret_code, str(std_out), str(std_err))
 
 
 """
