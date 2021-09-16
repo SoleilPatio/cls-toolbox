@@ -3,6 +3,15 @@
 from __future__ import print_function
 if __name__ == '__main__': import _libpythonpath_ #type: ignore (Add libPython\.. into PYTHONPATH when unittest )
 
+"""
+##################################################################
+OpenpyXL:
+    pros:
+    cons:
+        1. cannot read result of formula
+##################################################################
+"""
+
 import os
 import string
 
@@ -30,6 +39,9 @@ class ExcelfileOpenpyxl(object):
             #remove 1st sheet that auto created by "not write_oly open"
             # self.workbook.remove(self.workbook[self.workbook.sheetnames[0]])
         self.filename = filename
+
+    def Close(self):
+        pass
     
     def Save(self):
         return self.SaveAs(self.filename)
@@ -77,6 +89,7 @@ class ExcelfileOpenpyxl(object):
             return self.workbook.active.max_column
 
     #...................................
+    # common functions for all excel libraries
     # excel column name handling.
     # excel is 1-index (instead of 0-index)
     #...................................
@@ -110,7 +123,14 @@ class ExcelfileOpenpyxl(object):
             index = self.SheetList().index(sheet_name)
             self.workbook.active = index
 
+    def active(self):
+        return self.workbook.active
 
+    """
+    ========================================================
+    Misc (Not Interface)
+    ========================================================
+    """
     """
     -----------------------------------------------
     Write by ROWS
@@ -142,6 +162,7 @@ class ExcelfileOpenpyxl(object):
     def MergeCells(self, range_string=None, start_row=None, start_column=None, end_row=None, end_column=None):
         return self.workbook.active.merge_cells(range_string=range_string, start_row=start_row, start_column=start_column, end_row=end_row, end_column=end_column)
 
+    
 
     """
     ========================================================
