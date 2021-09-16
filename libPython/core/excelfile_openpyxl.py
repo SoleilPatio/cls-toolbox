@@ -126,6 +126,15 @@ class ExcelfileOpenpyxl(object):
     def active(self):
         return self.workbook.active
 
+    #...................................
+    # range_str = "A1:B10"
+    #...................................
+    def ReadRange(self, range ):
+        data = self.workbook.active[range]
+        data = [ [cell.value for cell in row] for row in data]
+        return data
+
+
     """
     ========================================================
     Misc (Not Interface)
