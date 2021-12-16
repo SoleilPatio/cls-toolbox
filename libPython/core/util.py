@@ -16,6 +16,8 @@ import traceback
 import errno
 import importlib
 import bisect
+import inspect
+
 
 
 """
@@ -34,7 +36,7 @@ Log Utilities
         dir : create out under it
 -----------------------------------------------
 """
-def LogInitial(base_path, level=logging.DEBUG, prog_name=""):
+def LogInitial(base_path, level=logging.DEBUG, prog_name="", format_no=0):
     #...................................
     #prepare Output directory
     #...................................
@@ -46,27 +48,52 @@ def LogInitial(base_path, level=logging.DEBUG, prog_name=""):
     #logger 
     #...................................
     exe_log_filename = os.path.join(OUT_DIR, f'log-execution-{prog_name}.log' if prog_name else 'log-execution.log' )
-    logging.basicConfig(filename=exe_log_filename, filemode='w', 
-        level=logging.DEBUG
-        # level=logging.INFO
-        )
+    
+    if format_no == 0:
+        logging.basicConfig(filename=exe_log_filename, filemode='w', 
+            level=level
+            # level=logging.INFO
+            )
+    else:
+        format = {
+            1: "%(asctime)s [%(levelname)s] %(message)s"
+        }
+
+        datefmt = {
+            1: "%Y-%m-%d %H:%M:%S"
+        }
+
+        logging.basicConfig(filename=exe_log_filename, filemode='w', 
+            level=level,
+            format = format[format_no], datefmt = datefmt[format_no]
+            )
+
+
     LogInfo("OUT_DIR= %s" % OUT_DIR, stdout=False)
     LogInfo("exe_log_filename= %s" % exe_log_filename, stdout=False)
     return OUT_DIR, exe_log_filename
 
 def Log( msg, stdout = True ):
+    func = inspect.currentframe().f_back.f_code
+    msg = f"{func.co_name}:{msg}"
     print(msg) if stdout else None
     logging.info(msg)
 
 def LogInfo( msg, stdout = True  ):
+    func = inspect.currentframe().f_back.f_code
+    msg = f"{func.co_name}:{msg}"
     print("[INFO]", msg) if stdout else None
     logging.info(msg)
 
 def LogWarning( msg, stdout = True  ):
+    func = inspect.currentframe().f_back.f_code
+    msg = f"{func.co_name}:{msg}"
     print("[WARN]", msg) if stdout else None
     logging.warning(msg)
 
 def LogError( msg, stdout = True  ):
+    func = inspect.currentframe().f_back.f_code
+    msg = f"{func.co_name}:{msg}"
     print("[ERROR]", msg) if stdout else None
     logging.error(msg)
 
@@ -319,8 +346,5 @@ Main Test
 --------------------------------------------------------
 """
 if __name__ == '__main__':
-    cmd = "dir -lsr"
-    # result, stdout, stderror = RunCommand(cmd)
-    # subprocess.run(["dir"])
-    RunCommandSync(cmd)
-    # print(stdout)
+    LogInitial(__file__, format_no=1)
+    LogInfo("Test")
