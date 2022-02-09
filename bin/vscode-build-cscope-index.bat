@@ -12,8 +12,8 @@ wc -l .vscode\cscope\cscope.files
 
 echo "Building cscope ..."
 cd .vscode\cscope\
-cscope -Rbkq -i cscope.files
+cscope -Rvbkq -i cscope.files
 cd ..\..
 
 @REM echo "Building ctags ..."
-@REM ctags -R -f .tags -L ctags.files
+@REM ctags -V -R -f .tags -L ctags.files

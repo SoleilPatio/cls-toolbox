@@ -22,12 +22,12 @@ echo "Total files listed: "`wc -l ctags.files`
 #  exit:  Ctrl-d
 echo "Building cscope ..."
 pushd .vscode/cscope/
-time cscope -Rbkq -i cscope.files
+time cscope -Rvbkq -i cscope.files
 popd
 
 
 # ctags (disable vscode plugin, not stable)
 echo "Building ctags ..."
-time ctags -R -f .tags -L ctags.files
+time ctags -V -R -f .tags -L ctags.files
 rm tags
 ln -s .tags tags
