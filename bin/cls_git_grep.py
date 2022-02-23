@@ -12,6 +12,12 @@ from fullpath import Fullpath
 
 
 if __name__ == "__main__":
+    if len(sys.argv) <= 1:
+        print("""
+    ex. cls_git_grep.py "module_init\(kbase_driver_init\)"
+        """)
+        exit(0)
+
     cmd = " ".join(sys.argv[1:])
     cmd = "git grep -n " + cmd
     print("command: ", cmd)
