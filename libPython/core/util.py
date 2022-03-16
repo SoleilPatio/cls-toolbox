@@ -288,36 +288,6 @@ def FindNearestFile( start_position, file_name ):
     return None
 
 
-"""
------------------------------------------------
-find all key=value pairs
------------------------------------------------
-"""
-def ParseKeyValuePairs(line):
-    ret = []
-    # key_value_list = re.findall(r"\w+\s*=\s*[^, ]+",line)
-    key_value_list = re.findall(r"[^,=:\[\]]+\s*=\s*[^, ]+", line)
-    for pair in key_value_list:
-        idx = pair.find("=")
-        key = pair[:idx].strip()
-        value = pair[idx+1:].strip()
-        ret.append((key, value))
-    return ret
-
-"""
------------------------------------------------
-return in seconds
------------------------------------------------
-"""
-def ParseTimestamp(line):
-    # teraterm style time stamp: "[2022-03-12 19:00:37.955]
-    m = re.match(r"\s*(\[.*\]).*", line)
-    if m:
-        timestamp = dateutil.parser.parse(m.group(1), fuzzy=True).timestamp()
-    else:
-        timestamp = None
-    return timestamp
-
 
 
 """
