@@ -47,7 +47,7 @@ def parse_teraterm_keyvalue_pairs(line):
     return (ret_ts, ret_keyval)
 
 
-def ParsekeyValue(line):
+def ParseKeyValue(line):
     line = line.strip()
     if line.startswith("["):
         return parse_teraterm_keyvalue_pairs(line)
@@ -66,4 +66,4 @@ if __name__ == '__main__':
     line = r" <idle>-0 [005] 387.386832: sched_wakeup: comm=met-cmd pid=6840 prio=120 success=1 target_cpu=005 state=R"
 
     # print(parse_ftrace_keyvalue_pairs(line))
-    print(ParsekeyValue(line))
+    print(ParseKeyValue(line))
