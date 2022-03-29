@@ -4,7 +4,7 @@ from __future__ import print_function
 
 import xlwings
 
-def ExcelUpdateFormula(excel_filename):
+def ExcelForceUpdate(excel_filename):
     app = xlwings.App(visible=False)
     book = app.books.open(excel_filename)
     book.save(excel_filename)
