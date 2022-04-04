@@ -60,7 +60,10 @@ def GenerateNFO( video_file_name ):
     with codecs.open(nfo_file_name, 'w' , encoding='utf-8') as outfile:
         outfile.write(MUSIC_VIDEO_NFO_TEMPLATE % (title_name,artist_name,album_name))
     
-    print("Create:%s"%nfo_file_name)
+    try:
+        print("Create:%s"%nfo_file_name)
+    except:
+        print("Create:%s"%nfo_file_name.encode('utf-8'))
 
     #...................................
     # Create *.tbn (*.jpg)
@@ -79,12 +82,17 @@ def GenerateNFO( video_file_name ):
         except:
             pass
         os.rename(jpg_file_name, tbn_file_name)
-        print("Create:%s"%tbn_file_name)
+
+        try:
+            print("Create:%s"%tbn_file_name)
+        except:
+            print("Create:%s"%tbn_file_name.encode('utf-8'))
 
     # print("nfo=", nfo_file_name)
     # print("file_status=", core.StrObj(file_status))
 
 if __name__ == "__main__":
+    print(f"Your output console encoding is: {sys.stdout.encoding}")
     
     parser = argparse.ArgumentParser(
         prog='XBMC Music Video Helper',
@@ -108,7 +116,7 @@ if __name__ == "__main__":
     file_list = []
     video_ext_list = ["mkv", "m4v", "mp4", "avi", "webm", "mpg"]
     fileinfo.list_all_files(file_list, args.dir, video_ext_list, args.r )
-    print("Files=", core.StrObj(file_list))
+    # print("Files=", core.StrObj(file_list))
 
     for f in file_list:
         GenerateNFO(f)
