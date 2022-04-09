@@ -15,10 +15,14 @@ if __name__ == "__main__":
         print(ii)
     print("")
 
+#...................................
+#
+#...................................
     print("======= Arguments =======")
     print("sys.argv = ", sys.argv )
     print("os.name = ", os.name )
     print("platform.system = ", platform.system() )
     print("platform.release = ", platform.release() )
-    
-    print("")
+
+    exit(0)
+ 
