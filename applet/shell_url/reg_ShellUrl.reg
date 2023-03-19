@@ -10,5 +10,4 @@ Windows Registry Editor Version 5.00
 
 [HKEY_CLASSES_ROOT\shell-url\shell\open\command]
 ; pythonw.exe full path must be assigned
-@="\"C:\\APN\\DEV\\PortablePython\\Portable Python-3.8.6 x64\\App\\Python\\pythonw.exe\" \"C:\\Users\\cloud\\OneDrive\\BIN\\cls-toolbox\\applet\\shell_url\\ShellUrl.py\" \"%1\""
-; @="\"C:\\APN\\DEV\\PortablePython\\Portable Python-3.8.6 x64\\App\\Python\\pythonw.exe\" \"C:\\Users\\cloud\\OneDrive\\BIN\\cls-toolbox\\applet\\shell_url\\ShellUrl.py\" \"%1\""
+@="\"C:\\APN\\DEV\\Python\\\\Python\\pythonw.exe\" \"C:\\APN\\DATA\\OneDrive\\BIN\\cls-toolbox\\applet\\shell_url\\ShellUrl.py\" \"%1\""
