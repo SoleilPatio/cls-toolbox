@@ -31,7 +31,7 @@ class FtraceLog():
         #...................................
         #ftrace file 
         #...................................
-        exe_log_filename = os.path.join(OUT_DIR, f'log-ftrace-{prog_name}.log' if prog_name else 'log-ftrace.log' )
+        exe_log_filename = os.path.join(OUT_DIR, f'log-ftrace-{prog_name}.log' if prog_name else 'log-ftrace.ftrace' )
 
 
         # console handlers
@@ -96,28 +96,37 @@ if __name__ == "__main__":
     import time
     import random
 
-    ftraceLog.LogInitial(__file__)
-    ftraceLog.atrace_B("SUMALL")
-    sum = 0
-    for i in range(10):
-        ftraceLog.atrace_B("sum_one")
+    # ftraceLog.LogInitial(__file__)
+    # ftraceLog.atrace_B("SUMALL")
+    # sum = 0
+    # for i in range(10):
+    #     ftraceLog.atrace_B("sum_one")
         
+    #     time.sleep(1)
+    #     ftraceLog.atrace_C("random1", int(random.random()*1000))
+
+    #     ftraceLog.atrace_B("X")
+    #     time.sleep(1)
+    #     ftraceLog.atrace_E()
+
+    #     time.sleep(1)
+    #     ftraceLog.atrace_S("mul", i)
+
+    #     ftraceLog.atrace_E()
+    #     time.sleep(2)
+
+    #     ftraceLog.atrace_F("mul", i)
+    #     ftraceLog.atrace_C("random2", int(random.random()*1000))
+
+    # ftraceLog.atrace_E()
+
+    # print('Done')
+
+    ftraceLog.LogInitial(__file__)
+
+    for i in range(10):
         time.sleep(1)
-        ftraceLog.atrace_C("random1", int(random.random()*1000))
+        # ftraceLog.atrace_C("FramebufferSurface", int(random.random()*1000))
+        ftraceLog.atrace_C("FramebufferSurface", 1)
 
-        ftraceLog.atrace_B("X")
-        time.sleep(1)
-        ftraceLog.atrace_E()
 
-        time.sleep(1)
-        ftraceLog.atrace_S("mul", i)
-
-        ftraceLog.atrace_E()
-        time.sleep(2)
-
-        ftraceLog.atrace_F("mul", i)
-        ftraceLog.atrace_C("random2", int(random.random()*1000))
-
-    ftraceLog.atrace_E()
-
-    print('Done')
