@@ -22,7 +22,9 @@ echo "Total files listed: "`wc -l ctags.files`
 #  exit:  Ctrl-d
 echo "Building cscope ..."
 pushd .vscode/cscope/
-time cscope -Rvbkq -i cscope.files
+# time cscope -Rvbkq -i cscope.files
+# change temp directory to local to prevent "/tmp/cscope.72" error
+time original_tmpdir=$TMPDIR; export TMPDIR=$(pwd); cscope -Rvbkq -i cscope.files; export TMPDIR=$original_tmpdir
 popd
 
 
